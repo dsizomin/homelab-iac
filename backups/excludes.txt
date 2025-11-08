@@ -1,0 +1,8 @@
+/srv/data/_prebackup_dumps/*.old
+/srv/data/authentik/db
+/srv/data/paperless/db
+/srv/data/komodo/db
+/srv/data/**/cache
+/srv/data/**/tmp
+*.tmp
+*.log

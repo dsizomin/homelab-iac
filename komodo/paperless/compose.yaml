@@ -1,0 +1,93 @@
+services:
+  paperless-redis:
+    image: redis:8-alpine
+    container_name: paperless-redis
+    restart: unless-stopped
+    volumes:
+      - paperless-redis:/data
+    networks:
+      - paperless
+
+  paperless-db:
+    image: docker.io/library/postgres:18
+    container_name: paperless-db
+    restart: unless-stopped
+    volumes:
+      - /srv/data/paperless/db:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperlessdb
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD_FILE: /run/secrets/paperless_db_password
+    networks:
+      - paperless
+    secrets:
+      - paperless_db_password
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless
+    restart: unless-stopped
+    depends_on:
+      - paperless-db
+      - paperless-redis
+    ports:
+      - "8000:8000"
+    networks:
+      - proxy
+      - paperless
+    volumes:
+      - /srv/data/paperless/data:/usr/src/paperless/data
+      - /srv/data/paperless/consume:/usr/src/paperless/consume
+      - /srv/data/paperless/media:/usr/src/paperless/media
+      - /srv/data/paperless/export:/usr/src/paperless/export
+    environment:
+      PAPERLESS_REDIS: redis://paperless-redis:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBPORT: 5432
+      PAPERLESS_DBNAME: paperlessdb
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS_FILE: /run/secrets/paperless_db_password
+      PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
+      PAPERLESS_URL: https://paperless.denyssizomin.com
+      PAPERLESS_CONSUMPTION_DIR: /usr/src/paperless/consume
+      PAPERLESS_DATA_DIR: /usr/src/paperless/data
+      PAPERLESS_MEDIA_ROOT: /usr/src/paperless/media
+      PAPERLESS_ENABLE_ALLAUTH: true
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
+        {
+          "openid_connect":
+            {
+              "OAUTH_PKCE_ENABLED":true,
+              "APPS":[{
+                "provider_id":"authentik",
+                "name":"authentik",
+                "client_id":"H0Rm9M7Mc5k3CSfdWT2FgTQdHxj7s8sI9j1wfbTd",
+                "settings":{
+                  "server_url":"https://auth.denyssizomin.com/application/o/paperless/.well-known/openid-configuration"
+                }
+              }
+            ]
+          }
+        }
+    secrets:
+      - paperless_db_password
+      - paperless_secret_key
+
+volumes:
+  paperless-redis:
+
+
+networks:
+  paperless:
+    name: paperless
+    internal: true
+  proxy:
+    name: caddy-proxy
+    external: true
+
+secrets:
+  paperless_db_password:
+    environment: PAPERLESS_DB_PASSWORD
+  paperless_secret_key:
+    environment: PAPERLESS_SECRET_KEY

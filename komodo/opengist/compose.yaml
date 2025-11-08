@@ -1,0 +1,23 @@
+services:
+  opengist:
+    image: thomiceli/opengist:1
+    container_name: opengist
+    restart: unless-stopped
+    ports:
+      - "6157:6157"
+    volumes:
+      - "/srv/data/opengist:/opengist"
+    networks:
+      - proxy
+    environment:
+      - OG_OIDC_PROVIDER_NAME=authentik
+      - OG_OIDC_CLIENT_KEY=CUqRMvTMK2h5jRaWV79u7piVV6u3DXgFAHGaGlQt
+      - OG_OIDC_DISCOVERY_URL=https://auth.denyssizomin.com/application/o/gist/.well-known/openid-configuration
+      - OG_OIDC_GROUP_CLAIM_NAME=groups
+      - OG_OIDC_ADMIN_GROUP=gist-admins
+      - OG_OIDC_SECRET=$OG_OIDC_SECRET
+
+networks:
+  proxy:
+    name: caddy-proxy
+    external: true

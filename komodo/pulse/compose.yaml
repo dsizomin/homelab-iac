@@ -1,0 +1,22 @@
+services:
+  pulse:
+    image: rcourtman/pulse:latest
+    container_name: pulse
+    environment:
+      - PULSE_PUBLIC_URL=https://pulse.denyssizomin.com
+      - OIDC_ENABLED=true
+      - OIDC_CLIENT_ID=MQfhM4SvORESEkAv54GGfuXTmQs4SUVqBtAZ8oMg
+      - OIDC_ISSUER_URL=https://auth.denyssizomin.com/application/o/pulse/
+      - OIDC_GROUPS_CLAIM=groups
+    ports:
+      - "7655:7655"
+    volumes:
+      - /srv/data/pulse:/data
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: caddy-proxy
+    external: true

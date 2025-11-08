@@ -1,0 +1,17 @@
+services:
+  cloudflare-ddns:
+    image: oznu/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    environment:
+      - API_KEY_FILE=/run/secrets/ddns_cloudflare_api_key
+      - ZONE=denyssizomin.com
+      - SUBDOMAIN=home
+      - PROXIED=false
+      - IP6_PROVIDER=none
+    secrets:
+      - ddns_cloudflare_api_key
+
+secrets:
+  ddns_cloudflare_api_key:
+    environment: DDNS_CLOUDFLARE_API_KEY

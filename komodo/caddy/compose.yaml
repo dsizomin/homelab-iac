@@ -1,0 +1,33 @@
+services:
+  caddy:
+    container_name: caddy
+    restart: unless-stopped
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /srv/compose/caddy/conf:/etc/caddy/:ro
+      - caddy-data:/data
+      - caddy-config:/config
+      - caddy-logs:/var/log/caddy
+    networks:
+      - proxy
+    secrets:
+      - acme_cloudflare_api_key
+
+networks:
+  proxy:
+    name: caddy-proxy
+    external: true
+
+secrets:
+  acme_cloudflare_api_key:
+    environment: ACME_CLOUDFLARE_API_KEY
+
+volumes:
+  caddy-data:
+  caddy-config:
+  caddy-logs:
