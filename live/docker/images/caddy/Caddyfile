@@ -1,0 +1,45 @@
+{
+  email me@denyssizomin.com
+  acme_dns cloudflare {file./run/secrets/acme_cloudflare_api_key}
+}
+
+auth.denyssizomin.com {
+  reverse_proxy tasks.authentik-server:9000
+}
+
+paperless.denyssizomin.com {
+  reverse_proxy tasks.paperless:8000
+}
+
+gist.denyssizomin.com {
+  reverse_proxy tasks.opengist:6157
+}
+
+cdn.denyssizomin.com {
+  reverse_proxy tasks.miniserve:8080
+}
+
+pulse.denyssizomin.com {
+  reverse_proxy tasks.pulse:7655
+}
+
+proxmox.denyssizomin.com {
+  reverse_proxy https://192.168.1.58:8006 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+  }
+}
+
+hass.denyssizomin.com {
+  reverse_proxy http://192.168.1.44:8123
+}
+
+portainer.denyssizomin.com {
+  reverse_proxy tasks.portainer:9443 {
+    transport http {
+      tls_insecure_skip_verify
+    }
+  }
+}
+

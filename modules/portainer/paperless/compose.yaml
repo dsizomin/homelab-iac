@@ -1,0 +1,75 @@
+services:
+  paperless-redis:
+    image: redis:8-alpine
+    volumes:
+      - paperless-redis:/data
+    networks:
+      - paperless_network
+
+  paperless-db:
+    image: docker.io/library/postgres:18
+    volumes:
+      - /srv/data/paperless/db:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperlessdb
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD_FILE: /run/secrets/paperless_db_password
+    networks:
+      - paperless_network
+    secrets:
+      - paperless_db_password
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    depends_on:
+      - paperless-db
+      - paperless-redis
+    networks:
+      - proxy_network
+      - paperless_network
+    volumes:
+      - /srv/data/paperless/data:/usr/src/paperless/data
+      - /srv/data/paperless/consume:/usr/src/paperless/consume
+      - /srv/data/paperless/media:/usr/src/paperless/media
+      - /srv/data/paperless/export:/usr/src/paperless/export
+    environment:
+      PAPERLESS_REDIS: redis://tasks.paperless-redis:6379
+      PAPERLESS_DBHOST: tasks.paperless-db
+      PAPERLESS_DBPORT: 5432
+      PAPERLESS_DBNAME: paperlessdb
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS_FILE: /run/secrets/paperless_db_password
+      PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
+      PAPERLESS_CONSUMPTION_DIR: /usr/src/paperless/consume
+      PAPERLESS_DATA_DIR: /usr/src/paperless/data
+      PAPERLESS_MEDIA_ROOT: /usr/src/paperless/media
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_URL: ${PAPERLESS_URL}
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: ${PAPERLESS_SOCIALACCOUNT_PROVIDERS}
+      PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+
+    secrets:
+      - paperless_db_password
+      - paperless_secret_key
+
+volumes:
+  paperless-redis:
+
+networks:
+  paperless_network:
+    name: paperless_network
+    internal: true
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true
+
+secrets:
+  paperless_db_password:
+    name: ${DB_PASSWORD_SECRET_NAME}
+    external: true
+  paperless_secret_key:
+    name: ${SECRET_KEY_SECRET_NAME}
+    external: true
+

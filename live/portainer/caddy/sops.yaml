@@ -1,0 +1,16 @@
+ACME_CLOUDFLARE_API_KEY: ENC[AES256_GCM,data:5tsngFVX8HkGAmm3F8OAeIkfnUGxVnZCEXXm3s//PFmk8GiBXUNLwA==,iv:UWKzIWxNlTBs75Hqv8RgXgmegH1ih00CU11/UgwxE8A=,tag:RqXrG8x86lB1ChFv5YrpCQ==,type:str]
+sops:
+    age:
+        - recipient: age1gwnudlxstwguyy45r2zts7hrta5x2lspcqtlsthgetx5z8ex0q4qmguhmh
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAycGZ1N2tMeVJFTVhwODJ0
+            amhlNnZXeVN1R25pZTQ3MllmVUxnZDVkUXhrCmZEYVQvNjlnaUtjT2FlQXoxVU4r
+            aEZEcFJxM0YweDE1alNKamdLYy9LMnMKLS0tIGNCeFAvWkVKNk5vOWZranZxdHJy
+            clNCZ1hSOEVjbk96OTNoQVRzRVltU2sKwjmDgmXarQkWQ02yyIoy2QhqpsUwtq/y
+            9KoiGPA6JoDBBfbPL94OJYT6T08+nhK99x0bAoSTa0oe96EkkUIGpA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-11-30T14:38:08Z"
+    mac: ENC[AES256_GCM,data:BUdadrTLWU1lZxGN++p64bJJn8dj7f29UOWVcfuiiwTTSRgT0vkU4YgqexXoD+aL/oFGOKrgQYvYWA9Bw5zMkL0d0g2lTEQttBQoJa1cRzCA3VfxL9fL0SRlx1neaz07JCV6sxqevtgvcbhteKkIYfaOjYQF86OSNFmjj8lAFHY=,iv:sZvPWQQjWNA94Lkaz4A2MCJzkN2qRsKDDNIffh6yzxs=,tag:9qAtnyjPlgyPAVKPy9iYtw==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.11.0

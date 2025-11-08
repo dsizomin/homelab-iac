@@ -1,0 +1,15 @@
+services:
+  miniserve:
+    image: svenstaro/miniserve:latest
+    volumes:
+      - /srv/data/miniserve:/data
+    command: >
+      /data --mkdir --rm-files --upload-files --interfaces 0.0.0.0 --port 8080
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true
+

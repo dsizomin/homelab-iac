@@ -1,0 +1,18 @@
+services:
+  pulse:
+    image: rcourtman/pulse:latest
+    environment:
+      - PULSE_PUBLIC_URL=${PULSE_PUBLIC_URL}
+      - OIDC_ENABLED=true
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_ISSUER_URL=${OIDC_ISSUER_URL}
+      - OIDC_GROUPS_CLAIM=groups
+    volumes:
+      - /srv/data/pulse:/data
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true

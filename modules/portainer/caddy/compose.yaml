@@ -1,0 +1,30 @@
+services:
+  caddy:
+    image: ${IMAGE}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+      - caddy-logs:/var/log/caddy
+    networks:
+      - proxy_network
+    secrets:
+      - acme_cloudflare_api_key
+
+networks:
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true
+
+secrets:
+  acme_cloudflare_api_key:
+    name: ${SECRET}
+    external: true
+
+volumes:
+  caddy-data:
+  caddy-config:
+  caddy-logs:
+
