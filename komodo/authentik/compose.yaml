@@ -62,7 +62,7 @@ services:
       POSTGRES_USER: authentik
       POSTGRES_PASSWORD_FILE: /run/secrets/authentik_db_password
     volumes:
-      - /srv/data/authentik/db:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - authentik
     secrets:
@@ -93,3 +93,4 @@ networks:
 
 volumes:
   authentik-redis:
+  postgres-data:
