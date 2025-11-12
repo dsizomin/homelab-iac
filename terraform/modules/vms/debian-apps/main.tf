@@ -30,15 +30,15 @@ resource "proxmox_virtual_environment_vm" "debian-apps-v3" {
   }
 
   cpu {
-    cores = 2
+    cores = 4
   }
 
-  memory { dedicated = 4048 }
+  memory { dedicated = 8192 }
 
   initialization {
     ip_config {
       ipv4 {
-        address = "192.168.1.98/24"
+        address = "192.168.1.99/24"
         gateway = "192.168.1.1"
       }
     }
