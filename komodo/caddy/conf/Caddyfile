@@ -32,7 +32,7 @@ proxmox.denyssizomin.com {
 }
 
 hass.denyssizomin.com {
-  reverse_proxy http://192.168.1.196:8123
+  reverse_proxy http://192.168.1.44:8123
 }
 
 portainer.denyssizomin.com {
