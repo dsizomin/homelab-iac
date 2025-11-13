@@ -8,13 +8,11 @@ terraform {
   }
 }
 
-resource "proxmox_virtual_environment_download_file" "hass-image" {
-  node_name               = var.node_name
-  datastore_id            = var.image_store
-  content_type            = "iso"
-  url                     = "https://github.com/home-assistant/operating-system/releases/download/16.3/haos_ova-16.3.qcow2.xz"
-  file_name               = "haos_ova-16.3.qcow2.xz.img"
-  decompression_algorithm = "zst"
+module "hass-image" {
+  source = "../../images/hass"
+
+  node_name   = var.node_name
+  image_store = var.image_store
 }
 
 resource "proxmox_virtual_environment_vm" "hass" {
@@ -50,7 +48,7 @@ resource "proxmox_virtual_environment_vm" "hass" {
   disk {
     datastore_id = var.vm_store
     interface    = "scsi0"
-    file_id      = proxmox_virtual_environment_download_file.hass-image.id
+    file_id      = module.hass-image.id
     size         = 32
     discard      = "on"
     ssd          = true
@@ -65,7 +63,7 @@ resource "proxmox_virtual_environment_vm" "hass" {
   initialization {
     ip_config {
       ipv4 {
-        address = "192.168.1.44/24"
+        address = var.ipv4_address
         gateway = "192.168.1.1"
       }
     }

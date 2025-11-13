@@ -1,12 +1,3 @@
-variable "proxmox_endpoint" {
-  type = string
-}
-
-variable "proxmox_token" {
-  type      = string
-  sensitive = true
-}
-
 variable "node_name" {
   type    = string
   default = "pve"
@@ -20,6 +11,20 @@ variable "image_store" {
 variable "vm_store" {
   type    = string
   default = "local-lvm"
+}
+
+variable "cloud_init_parts" {
+  type = list(object({
+    content      = string
+    content_type = optional(string)
+    filename     = optional(string)
+    merge_type   = optional(string)
+  }))
+  default = []
+}
+
+variable "hostname" {
+  type = string
 }
 
 variable "username" {
@@ -38,9 +43,3 @@ variable "opkssh" {
   })
 }
 
-variable "ipv4_addresses" {
-  type = object({
-    debian-apps = string
-    hass        = string
-  })
-}

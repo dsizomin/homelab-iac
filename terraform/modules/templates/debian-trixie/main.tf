@@ -14,6 +14,7 @@ resource "proxmox_virtual_environment_download_file" "debian-image" {
   content_type        = "iso"
   url                 = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
   file_name           = "debian-13-genericcloud-amd64.img"
+  overwrite           = false
   overwrite_unmanaged = true
 }
 

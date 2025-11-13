@@ -13,6 +13,22 @@ variable "vm_store" {
   default = "local-lvm"
 }
 
+variable "username" {
+  type = string
+}
+
+variable "ssh_pubkey" {
+  type = string
+}
+
+variable "opkssh" {
+  type = object({
+    issuer    = string
+    subject   = string
+    client_id = string
+  })
+}
+
 variable "ipv4_address" {
   type    = string
   default = "dhcp"

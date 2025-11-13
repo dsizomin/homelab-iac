@@ -5,6 +5,10 @@ terraform {
       source  = "bpg/proxmox"
       version = ">= 0.50.0"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = ">= 3.6.2"
+    }
   }
 }
 
@@ -19,3 +23,7 @@ provider "proxmox" {
   }
 }
 
+provider "docker" {
+  host     = "ssh://${var.username}@${var.ipv4_addresses.debian-apps}:22"
+  ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+}

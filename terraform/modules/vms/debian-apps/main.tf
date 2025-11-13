@@ -26,7 +26,9 @@ resource "proxmox_virtual_environment_vm" "debian-apps-v3" {
   tags      = ["debian", "terraform"]
 
   clone {
-    vm_id = module.debian-apps-template.template_vm_id
+    full    = true
+    retries = 1
+    vm_id   = module.debian-apps-template.template_vm_id
   }
 
   cpu {
