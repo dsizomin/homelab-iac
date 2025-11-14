@@ -10,6 +10,7 @@ services:
       - caddy-logs:/var/log/caddy
     networks:
       - proxy_network
+      # - public_network
     secrets:
       - acme_cloudflare_api_key
 
@@ -17,6 +18,9 @@ networks:
   proxy_network:
     name: proxy_network
     external: true
+  # public_network:
+  #   name: public_network
+  #   external: true
 
 secrets:
   acme_cloudflare_api_key:

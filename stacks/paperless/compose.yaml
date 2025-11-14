@@ -24,8 +24,6 @@ services:
     depends_on:
       - paperless-db
       - paperless-redis
-    ports:
-      - "8080:8000"
     networks:
       - proxy_network
       - paperless_network

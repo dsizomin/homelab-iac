@@ -1,8 +1,6 @@
 services:
   opengist:
     image: thomiceli/opengist:1
-    ports:
-      - "6157:6157"
     volumes:
       - "/srv/data/opengist:/opengist"
     networks:

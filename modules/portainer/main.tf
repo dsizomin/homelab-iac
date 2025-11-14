@@ -5,8 +5,15 @@ resource "docker_network" "agent_network" {
 }
 
 resource "docker_network" "proxy_network" {
-  name   = "proxy_network"
-  driver = "overlay"
+  name     = "proxy_network"
+  driver   = "overlay"
+  internal = true
+}
+
+resource "docker_network" "public_network" {
+  name     = "public_network"
+  driver   = "overlay"
+  internal = false
 }
 
 resource "docker_image" "agent" {
@@ -62,19 +69,20 @@ resource "docker_service" "agent" {
       name = docker_network.agent_network.id
     }
 
+
     placement {
       constraints = ["node.platform.os == linux"]
     }
   }
 
-  endpoint_spec {
-    ports {
-      target_port    = 9091
-      published_port = 9091
-      protocol       = "tcp"
-      publish_mode   = "ingress"
-    }
-  }
+  # endpoint_spec {
+  #   ports {
+  #     target_port    = 9443
+  #     published_port = 9443
+  #     protocol       = "tcp"
+  #     publish_mode   = "ingress"
+  #   }
+  # }
 
   mode {
     global = true
@@ -113,9 +121,13 @@ resource "docker_service" "portainer" {
       name = docker_network.agent_network.id
     }
 
-    networks_advanced {
-      name = docker_network.proxy_network.id
-    }
+    # networks_advanced {
+    #   name = docker_network.proxy_network.id
+    # }
+
+    # networks_advanced {
+    #   name = docker_network.public_network.id
+    # }
 
     placement {
       constraints = ["node.role == manager"]
@@ -123,23 +135,11 @@ resource "docker_service" "portainer" {
   }
 
   endpoint_spec {
-    # ports {
-    #   target_port    = 9443
-    #   published_port = 9093
-    #   protocol       = "tcp"
-    #   publish_mode   = "ingress"
-    # }
     ports {
-      target_port    = 9000
-      published_port = 9090
-      protocol       = "tcp"
-      publish_mode   = "ingress"
-    }
-    ports {
-      target_port    = 8000
-      published_port = 8080
-      protocol       = "tcp"
-      publish_mode   = "ingress"
+      target_port    = 9443
+      published_port = 9443
+      # protocol       = "tcp"
+      # publish_mode   = "ingress"
     }
   }
 

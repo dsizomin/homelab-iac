@@ -8,7 +8,7 @@ auth.denyssizomin.com {
 }
 
 paperless.denyssizomin.com {
-  reverse_proxy tasks.paperless:8080
+  reverse_proxy tasks.paperless:8000
 }
 
 gist.denyssizomin.com {
@@ -16,7 +16,7 @@ gist.denyssizomin.com {
 }
 
 cdn.denyssizomin.com {
-  reverse_proxy tasks.miniserve:8085
+  reverse_proxy tasks.miniserve:8080
 }
 
 pulse.denyssizomin.com {
@@ -36,5 +36,9 @@ hass.denyssizomin.com {
 }
 
 portainer.denyssizomin.com {
-  reverse_proxy tasks.portainer:9090
+  reverse_proxy tasks.portainer:9443 {
+    transport http {
+      tls_insecure_skip_verify
+    }
+  }
 }

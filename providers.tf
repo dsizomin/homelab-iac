@@ -43,6 +43,6 @@ provider "docker" {
 provider "portainer" {
   api_user        = "admin"
   api_password    = var.portainer_password
-  endpoint        = "http://${local.docker_apps_ipv4_address}:9090"
+  endpoint        = "https://${local.docker_apps_ipv4_address}:9443"
   skip_ssl_verify = true
 }
