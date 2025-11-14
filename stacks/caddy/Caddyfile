@@ -4,23 +4,23 @@
 }
 
 auth.denyssizomin.com {
-  reverse_proxy task.authentik-server:9000
+  reverse_proxy tasks.authentik-server:9000
 }
 
 paperless.denyssizomin.com {
-  reverse_proxy task.paperless:8080
+  reverse_proxy tasks.paperless:8080
 }
 
 gist.denyssizomin.com {
-  reverse_proxy task.opengist:6157
+  reverse_proxy tasks.opengist:6157
 }
 
 cdn.denyssizomin.com {
-  reverse_proxy task.miniserve:8085
+  reverse_proxy tasks.miniserve:8085
 }
 
 pulse.denyssizomin.com {
-  reverse_proxy task.pulse:7655
+  reverse_proxy tasks.pulse:7655
 }
 
 proxmox.denyssizomin.com {
@@ -36,5 +36,5 @@ hass.denyssizomin.com {
 }
 
 portainer.denyssizomin.com {
-  reverse_proxy task.portainer:9090
+  reverse_proxy tasks.portainer:9090
 }
