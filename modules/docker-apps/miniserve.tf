@@ -1,8 +1,9 @@
 resource "portainer_stack" "portainer-miniserve" {
   name            = "miniserve"
   deployment_type = "swarm"
-  method          = "string"
   endpoint_id     = 1
 
-  stack_file_content = file("${path.root}/stacks/miniserve/compose.yaml")
+  method                  = "repository"
+  repository_url          = "https://github.com/dsizomin/homelab-iac.git"
+  file_path_in_repository = "stacks/miniserve/compose.yaml"
 }

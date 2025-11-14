@@ -1,10 +1,11 @@
 resource "portainer_stack" "portainer-pulse" {
   name            = "pulse"
   deployment_type = "swarm"
-  method          = "string"
   endpoint_id     = 1
 
-  stack_file_content = file("${path.root}/stacks/pulse/compose.yaml")
+  method                  = "repository"
+  repository_url          = "https://github.com/dsizomin/homelab-iac.git"
+  file_path_in_repository = "stacks/pulse/compose.yaml"
 
   env {
     name  = "PULSE_PUBLIC_URL"

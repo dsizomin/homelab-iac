@@ -20,10 +20,11 @@ resource "portainer_docker_secret" "authentik_secret_key" {
 resource "portainer_stack" "portainer_authentik" {
   name            = "authentik"
   deployment_type = "swarm"
-  method          = "string"
   endpoint_id     = 1
 
-  stack_file_content = file("${path.root}/stacks/authentik/compose.yaml")
+  method                  = "repository"
+  repository_url          = "https://github.com/dsizomin/homelab-iac.git"
+  file_path_in_repository = "stacks/authentik/compose.yaml"
 
   depends_on = [
     portainer_docker_secret.authentik_db_password,
