@@ -1,0 +1,15 @@
+services:
+  cloudflare-ddns:
+    image: oznu/cloudflare-ddns:latest
+    environment:
+      - API_KEY_FILE=/run/secrets/ddns_cloudflare_api_key
+      - ZONE=${ZONE}
+      - SUBDOMAIN=${SUBDOMAIN}
+      - PROXIED=false
+      - IP6_PROVIDER=none
+    secrets:
+      - ddns_cloudflare_api_key
+
+secrets:
+  ddns_cloudflare_api_key:
+    external: true
