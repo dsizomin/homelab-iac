@@ -2,7 +2,7 @@ services:
   miniserve:
     image: svenstaro/miniserve:latest
     ports:
-      - "8080:8080"
+      - "8085:8080"
     volumes:
       - /srv/data/miniserve:/data
     command: >

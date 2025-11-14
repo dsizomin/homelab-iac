@@ -69,8 +69,8 @@ resource "docker_service" "agent" {
 
   endpoint_spec {
     ports {
-      target_port    = 9001
-      published_port = 9001
+      target_port    = 9091
+      published_port = 9091
       protocol       = "tcp"
       publish_mode   = "ingress"
     }
@@ -92,7 +92,7 @@ resource "docker_service" "portainer" {
         "--admin-password-file",
         local.portainer_password_file_name,
         "-H",
-        "tcp://tasks.agent:9001",
+        "tcp://tasks.agent:9091",
         "--tlsskipverify",
       ]
 
@@ -123,6 +123,12 @@ resource "docker_service" "portainer" {
   }
 
   endpoint_spec {
+    # ports {
+    #   target_port    = 9443
+    #   published_port = 9093
+    #   protocol       = "tcp"
+    #   publish_mode   = "ingress"
+    # }
     ports {
       target_port    = 9000
       published_port = 9090
@@ -131,7 +137,7 @@ resource "docker_service" "portainer" {
     }
     ports {
       target_port    = 8000
-      published_port = 8000
+      published_port = 8080
       protocol       = "tcp"
       publish_mode   = "ingress"
     }

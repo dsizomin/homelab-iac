@@ -2,8 +2,8 @@ resource "docker_image" "caddy_image" {
   name         = "caddy_acme_cloudflare"
   keep_locally = true
   build {
-    dockerfile = "${path.root}/stacks/caddy/Dockerfile"
-    context    = "${path.root}/stacks/caddy/"
+    context        = "."
+    remote_context = "https://github.com/dsizomin/homelab-iac.git#:/stacks/caddy"
   }
   triggers = {
     dir_sha1 = sha1(join("", [for f in fileset(path.root, "./stacks/caddy/**") : filesha1(f)]))
