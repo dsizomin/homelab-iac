@@ -12,4 +12,3 @@ locals {
   # Generate ACME email
   acme_email = "${var.email_prefix}@${var.zone}"
 }
-

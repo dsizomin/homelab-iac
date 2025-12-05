@@ -7,3 +7,8 @@ output "dns_config" {
   }
 }
 
+output "dns_servers" {
+  description = "DNS server IP addresses"
+  value       = var.dns_servers
+}
+

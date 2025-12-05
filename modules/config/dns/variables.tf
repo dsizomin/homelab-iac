@@ -61,3 +61,14 @@ variable "email_prefix" {
   default     = "me"
 }
 
+variable "dns_servers" {
+  type = object({
+    primary   = string
+    secondary = string
+  })
+  description = "DNS server IP addresses"
+  default = {
+    primary   = "192.168.1.111",
+    secondary = "192.168.1.222",
+  }
+}

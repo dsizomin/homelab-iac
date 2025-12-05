@@ -25,6 +25,7 @@ The homelab is organized into three main layers:
 - [portainer/portainer](https://registry.terraform.io/providers/portainer/portainer) - Container stack deployment
 - [kreuzwerker/docker](https://registry.terraform.io/providers/kreuzwerker/docker) - Docker resources
 - [goauthentik/authentik](https://registry.terraform.io/providers/goauthentik/authentik) - SSO/Identity management
+- [gmichels/adguard](https://registry.terraform.io/providers/gmichels/adguard) - AdGuard Home DNS management
 
 ## ⚙️ Configuration Management
 
@@ -80,6 +81,48 @@ This ensures all service domains in the reverse proxy configuration stay synchro
 
 Centralized OIDC provider client IDs for Authentik SSO integration.
 
+### AdGuard DNS Configuration (`live/adguard/`)
+
+The homelab includes redundant AdGuard Home DNS servers for network-wide ad blocking and DNS management:
+
+#### Architecture
+
+- **Primary DNS Server** (`live/adguard/primary/`) - Main AdGuard Home instance
+- **Secondary DNS Server** (`live/adguard/secondary/`) - Redundant backup instance
+- Both instances are managed identically via Terraform using the same module (`modules/adguard/`)
+
+#### DNS Filtering
+
+Three curated blocklists are automatically configured on both servers:
+
+1. **AdGuard DNS filter** - AdGuard's official filter list
+2. **AdAway Default Blocklist** - Community-maintained mobile ad blocking
+3. **Hagezi Pro++** - Comprehensive protection against ads, trackers, and malware
+
+#### Upstream DNS Configuration
+
+AdGuard uses **Quad9** as the upstream DNS provider with multiple secure protocols:
+
+- **DNSCrypt** (`sdns://...`) - Encrypted DNS with authentication
+- **DNS-over-HTTPS** (`https://dns11.quad9.net/dns-query`)
+- **DNS-over-TLS** (`tls://dns11.quad9.net`)
+
+Bootstrap DNS servers (for resolving secure DNS endpoints):
+- `9.9.9.9` and `149.112.112.11` (IPv4)
+- `2620:fe::11` and `2620:fe::fe:11` (IPv6)
+
+#### Local Network Integration
+
+- **Reverse DNS (PTR)**: Configured to use local router (`192.168.1.1:53`) for reverse lookups
+- **Wildcard DNS Rewrite**: All `*.denyssizomin.com` domains automatically resolve to the reverse proxy IP
+- **Centralized Configuration**: Domain zones and service FQDNs pulled from the centralized DNS config module
+
+This setup ensures:
+- Network-wide ad and tracker blocking
+- Encrypted DNS queries to upstream providers
+- High availability with redundant DNS servers
+- Automatic service discovery via wildcard DNS rewriting
+
 ## 📁 Repository Structure
 
 ```
@@ -89,6 +132,9 @@ Centralized OIDC provider client IDs for Authentik SSO integration.
 │   ├── config/                    # Configuration management
 │   │   ├── dns/                   # Centralized DNS/FQDN configuration
 │   │   └── oidc/                  # OIDC provider configurations
+│   ├── adguard/                   # AdGuard DNS servers
+│   │   ├── primary/               # Primary AdGuard Home instance
+│   │   └── secondary/             # Secondary AdGuard Home instance
 │   ├── infra/                     # Infrastructure layer
 │   │   ├── providers.hcl          # Proxmox provider configuration
 │   │   └── vms/                   # Virtual machine definitions
@@ -243,6 +289,8 @@ Terragrunt automatically handles dependencies between modules using `dependency`
 
 | Application | Description | Module Path |
 |-------------|-------------|-------------|
+| **AdGuard Home (Primary)** | Network-wide DNS & Ad Blocking | `adguard/primary` |
+| **AdGuard Home (Secondary)** | Redundant DNS Server | `adguard/secondary` |
 | **Authentik** | Identity Provider & SSO | `portainer/authentik` |
 | **Caddy** | Reverse Proxy & TLS | `portainer/caddy` |
 | **Paperless-ngx** | Document Management | `portainer/paperless` |

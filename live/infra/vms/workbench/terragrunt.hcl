@@ -10,6 +10,10 @@ terraform {
   source = "../../../../modules/infra/vms/debian-vm"
 }
 
+dependency "dns_config" {
+  config_path = "../../../config/dns"
+}
+
 locals {
   username = "denys.sizomin"
   email = "denys.sizomin@gmail.com"
@@ -72,7 +76,10 @@ inputs = {
 
   ipv4_address = "192.168.1.55/24"
   ipv4_gateway = "192.168.1.1"
-  dns_servers  = ["192.168.1.111", "192.168.1.222"]
+  dns_servers = [
+    dependency.dns_config.outputs.dns_servers.primary,
+    dependency.dns_config.outputs.dns_servers.secondary,
+  ]
 
   tags = ["terraform", "vm"]
 
