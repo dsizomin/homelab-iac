@@ -7,3 +7,12 @@ variable "oidc_client_id" {
   type        = string
   description = "The client ID for the  Opengist OIDC provider."
 }
+
+variable "dns_config" {
+  type = object({
+    zone     = string
+    services = map(string)
+    email    = string
+  })
+  description = "DNS configuration from the dns module"
+}

@@ -14,6 +14,10 @@ dependency "proxy_network" {
   config_path = "../../docker/networks/proxy"
 }
 
+dependency "dns_config" {
+  config_path = "../../config/dns"
+}
+
 generate "providers_authentik" {
   path      = "providers_authentik.tf"
   if_exists = "overwrite_terragrunt"
@@ -25,8 +29,9 @@ EOF
 }
 
 inputs = {
-  proxy_network = dependency.proxy_network.outputs.network_id
+  proxy_network  = dependency.proxy_network.outputs.network_id
   oidc_client_id = dependency.oidc_config.outputs.client_id.opengist
+  dns_config     = dependency.dns_config.outputs.dns_config
 }
 
 terraform {

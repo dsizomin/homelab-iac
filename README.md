@@ -26,6 +26,38 @@ The homelab is organized into three main layers:
 - [kreuzwerker/docker](https://registry.terraform.io/providers/kreuzwerker/docker) - Docker resources
 - [goauthentik/authentik](https://registry.terraform.io/providers/goauthentik/authentik) - SSO/Identity management
 
+## ⚙️ Configuration Management
+
+The homelab uses centralized configuration modules to ensure consistency across all services:
+
+### DNS/FQDN Configuration (`live/config/dns/`)
+
+All service domain names are centrally managed in the DNS configuration module. This provides:
+
+- **Single Source of Truth**: All FQDNs are defined in one place (`live/config/dns/terragrunt.hcl`)
+- **Consistency**: Services reference domain names via variables instead of hardcoded literals
+- **Easy Updates**: Change domain names once, propagate everywhere automatically
+- **Type Safety**: Terraform validates FQDN usage across all modules
+
+Services access DNS configuration through the `dns_config` variable:
+```hcl
+dns_config = {
+  zone     = "denyssizomin.com"
+  services = {
+    auth      = "auth.denyssizomin.com"
+    pulse     = "pulse.denyssizomin.com"
+    paperless = "paperless.denyssizomin.com"
+    gist      = "gist.denyssizomin.com"
+    # ... other services
+  }
+  email = "admin@denyssizomin.com"
+}
+```
+
+### OIDC Configuration (`live/config/oidc/`)
+
+Centralized OIDC provider client IDs for Authentik SSO integration.
+
 ## 📁 Repository Structure
 
 ```
@@ -33,6 +65,7 @@ The homelab is organized into three main layers:
 ├── live/                          # Live environment configurations
 │   ├── root.hcl                   # Root Terragrunt config with S3 backend
 │   ├── config/                    # Configuration management
+│   │   ├── dns/                   # Centralized DNS/FQDN configuration
 │   │   └── oidc/                  # OIDC provider configurations
 │   ├── infra/                     # Infrastructure layer
 │   │   ├── providers.hcl          # Proxmox provider configuration
@@ -62,6 +95,7 @@ The homelab is organized into three main layers:
 │   ├── authentik/                 # Authentik configuration modules
 │   │   └── oidc_provider/         # OIDC provider module
 │   ├── config/                    # Configuration modules
+│   │   ├── dns/                   # DNS configuration module
 │   │   └── oidc/                  # OIDC configuration
 │   ├── docker/                    # Docker resource modules
 │   ├── infra/                     # Infrastructure modules

@@ -29,7 +29,7 @@ resource "portainer_stack" "this" {
 
   env {
     name  = "DOMAINS"
-    value = "home.denyssizomin.com"
+    value = var.dns_config.services.home
   }
 
   env {

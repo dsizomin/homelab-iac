@@ -52,7 +52,7 @@ module "provider" {
   client_id   = var.oidc_client_id
   client_type = "public"
   redirect_uris = [
-    "https://paperless.denyssizomin.com/accounts/oidc/authentik/login/callback/"
+    "https://${var.dns_config.services.paperless}/accounts/oidc/authentik/login/callback/"
   ]
 }
 
@@ -71,7 +71,7 @@ resource "portainer_stack" "this" {
 
   env {
     name  = "PAPERLESS_URL"
-    value = "https://paperless.denyssizomin.com"
+    value = "https://${var.dns_config.services.paperless}"
   }
 
   env {

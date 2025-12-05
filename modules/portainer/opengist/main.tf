@@ -18,7 +18,7 @@ module "provider" {
   client_id   = var.oidc_client_id
   client_type = "confidential"
   redirect_uris = [
-    "https://gist.denyssizomin.com/oauth/openid-connect/callback"
+    "https://${var.dns_config.services.gist}/oauth/openid-connect/callback"
   ]
 }
 

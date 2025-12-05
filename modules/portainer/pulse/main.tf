@@ -18,7 +18,7 @@ module "provider" {
   client_id   = var.oidc_client_id
   client_type = "public"
   redirect_uris = [
-    "https://pulse.denyssizomin.com/api/oidc/callback"
+    "https://${var.dns_config.services.pulse}/api/oidc/callback"
   ]
 }
 
@@ -32,7 +32,7 @@ resource "portainer_stack" "this" {
 
   env {
     name  = "PULSE_PUBLIC_URL"
-    value = "https://pulse.denyssizomin.com"
+    value = "https://${var.dns_config.services.pulse}"
   }
   env {
     name  = "OIDC_CLIENT_ID"
