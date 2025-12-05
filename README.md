@@ -54,6 +54,28 @@ dns_config = {
 }
 ```
 
+**Example: Caddyfile Templating**
+
+The Caddyfile for Caddy reverse proxy is dynamically generated using the DNS config:
+
+```hcl
+# live/docker/images/caddy/terragrunt.hcl
+dependency "dns_config" {
+  config_path = "../../../config/dns"
+}
+
+locals {
+  caddyfile_content = templatefile("${get_terragrunt_dir()}/Caddyfile.tpl", {
+    email          = local.dns_config.email
+    auth_fqdn      = local.dns_config.services.auth
+    paperless_fqdn = local.dns_config.services.paperless
+    # ... other services
+  })
+}
+```
+
+This ensures all service domains in the reverse proxy configuration stay synchronized with the central DNS config.
+
 ### OIDC Configuration (`live/config/oidc/`)
 
 Centralized OIDC provider client IDs for Authentik SSO integration.

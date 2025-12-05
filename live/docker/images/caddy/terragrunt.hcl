@@ -6,18 +6,26 @@ include "docker" {
   path = find_in_parent_folders("providers.hcl")
 }
 
+dependency "dns_config" {
+  config_path = "../../../config/dns"
+}
+
 terraform {
   source = "../../../../modules/docker/images/caddy"
 }
 
-locals {
-  caddyfile_content = file("Caddyfile")
-}
-
-
 inputs = {
   image_name = "homelab/caddy-cloudflare:latest"
-  caddyfile  = local.caddyfile_content
-
-  keep_locally     = true
+  caddyfile  = templatefile("${get_terragrunt_dir()}/Caddyfile.tftpl", {
+    email           = dependency.dns_config.outputs.dns_config.email
+    auth_fqdn       = dependency.dns_config.outputs.dns_config.services.auth
+    paperless_fqdn  = dependency.dns_config.outputs.dns_config.services.paperless
+    gist_fqdn       = dependency.dns_config.outputs.dns_config.services.gist
+    cdn_fqdn        = dependency.dns_config.outputs.dns_config.services.cdn
+    pulse_fqdn      = dependency.dns_config.outputs.dns_config.services.pulse
+    proxmox_fqdn    = dependency.dns_config.outputs.dns_config.services.proxmox
+    hass_fqdn       = dependency.dns_config.outputs.dns_config.services.hass
+    portainer_fqdn  = dependency.dns_config.outputs.dns_config.services.portainer
+  })
+  keep_locally = true
 }
