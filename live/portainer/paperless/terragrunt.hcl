@@ -23,7 +23,7 @@ generate "providers_authentik" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "authentik" {
-  url   = "https://auth.denyssizomin.com/"
+  url   = "https://${dependency.dns_config.outputs.dns_config.services.auth}/"
 }
 EOF
 }

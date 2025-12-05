@@ -10,6 +10,10 @@ dependency "oidc_config" {
   config_path = "../../config/oidc"
 }
 
+dependency "dns_config" {
+  config_path = "../../config/dns"
+}
+
 inputs = {
   oidc_client_id     = dependency.oidc_config.outputs.client_id.portainer
   portainer_hostname = "portainer.denyssizomin.com"
@@ -20,7 +24,7 @@ generate "providers_authentik" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "authentik" {
-  url   = "https://auth.denyssizomin.com/"
+  url   = "https://${dependency.dns_config.outputs.dns_config.services.auth}/"
 }
 EOF
 }

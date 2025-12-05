@@ -73,7 +73,7 @@ inputs = {
 
   ipv4_address = "192.168.1.99/24"
   ipv4_gateway = "192.168.1.1"
-  dns_servers  = ["192.168.1.111", "192.168.1.222", "9.9.9.9"]
+  dns_servers  = ["192.168.1.111", "192.168.1.222"]
 
   tags = ["terraform", "docker", "vm"]
 
