@@ -1,5 +1,5 @@
 services:
-  cloudflare-ddns:
+  worker:
     image: favonia/cloudflare-ddns:latest
     environment:
       - CLOUDFLARE_API_TOKEN_FILE=/run/secrets/ddns_cloudflare_api_key
@@ -13,4 +13,3 @@ secrets:
   ddns_cloudflare_api_key:
     name: ${SECRET}
     external: true
-

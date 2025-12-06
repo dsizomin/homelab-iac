@@ -1,15 +1,15 @@
 services:
-  paperless-redis:
+  redis:
     image: redis:8-alpine
     volumes:
-      - paperless-redis:/data
+      - redis:/data
     networks:
       - paperless_network
 
-  paperless-db:
+  db:
     image: docker.io/library/postgres:18
     volumes:
-      - /srv/data/paperless/db:/var/lib/postgresql
+      - db:/var/lib/postgresql
     environment:
       POSTGRES_DB: paperlessdb
       POSTGRES_USER: paperless
@@ -19,22 +19,24 @@ services:
     secrets:
       - paperless_db_password
 
-  paperless:
+  webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    labels:
+      com.denyssizomin.apps.backup: paperless
     depends_on:
-      - paperless-db
-      - paperless-redis
+      - db
+      - redis
     networks:
       - proxy_network
       - paperless_network
     volumes:
-      - /srv/data/paperless/data:/usr/src/paperless/data
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
       - /srv/data/paperless/consume:/usr/src/paperless/consume
-      - /srv/data/paperless/media:/usr/src/paperless/media
       - /srv/data/paperless/export:/usr/src/paperless/export
     environment:
-      PAPERLESS_REDIS: redis://tasks.paperless-redis:6379
-      PAPERLESS_DBHOST: tasks.paperless-db
+      PAPERLESS_REDIS: redis://tasks.redis:6379
+      PAPERLESS_DBHOST: tasks.db
       PAPERLESS_DBPORT: 5432
       PAPERLESS_DBNAME: paperlessdb
       PAPERLESS_DBUSER: paperless
@@ -55,7 +57,10 @@ services:
       - paperless_secret_key
 
 volumes:
-  paperless-redis:
+  redis:
+  db:
+  media:
+  data:
 
 networks:
   paperless_network:
@@ -72,4 +77,3 @@ secrets:
   paperless_secret_key:
     name: ${SECRET_KEY_SECRET_NAME}
     external: true
-

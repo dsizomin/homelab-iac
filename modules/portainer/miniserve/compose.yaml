@@ -1,5 +1,5 @@
 services:
-  miniserve:
+  webserver:
     image: svenstaro/miniserve:latest
     volumes:
       - /srv/data/miniserve:/data
@@ -12,4 +12,3 @@ networks:
   proxy_network:
     name: ${PROXY_NETWORK}
     external: true
-

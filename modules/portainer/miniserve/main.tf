@@ -11,6 +11,7 @@ terraform {
 resource "portainer_stack" "this" {
   name            = "miniserve"
   deployment_type = "swarm"
+  prune           = true
   endpoint_id     = 1
 
   method          = "file"

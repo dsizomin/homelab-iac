@@ -41,6 +41,7 @@ resource "portainer_stack" "this" {
   name            = "opengist"
   deployment_type = "swarm"
   endpoint_id     = 1
+  prune           = true
 
   method          = "file"
   stack_file_path = "./compose.yaml"

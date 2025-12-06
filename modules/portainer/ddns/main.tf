@@ -22,6 +22,7 @@ resource "portainer_docker_secret" "ddns_cloudflare_api_key" {
 resource "portainer_stack" "this" {
   name            = "ddns"
   deployment_type = "swarm"
+  prune           = true
   endpoint_id     = 1
 
   method          = "file"

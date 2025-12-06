@@ -1,5 +1,5 @@
 services:
-  pulse:
+  webserver:
     image: rcourtman/pulse:latest
     environment:
       - PULSE_PUBLIC_URL=${PULSE_PUBLIC_URL}

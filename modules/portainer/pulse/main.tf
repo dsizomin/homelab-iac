@@ -25,6 +25,7 @@ module "provider" {
 resource "portainer_stack" "this" {
   name            = "pulse"
   deployment_type = "swarm"
+  prune           = true
   endpoint_id     = 1
 
   method          = "file"
