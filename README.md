@@ -123,6 +123,42 @@ This setup ensures:
 - High availability with redundant DNS servers
 - Automatic service discovery via wildcard DNS rewriting
 
+### Vaultwarden Password Manager (`live/portainer/vaultwarden/`)
+
+The homelab includes Vaultwarden, a lightweight alternative implementation of the Bitwarden password manager, configured for SSO-only authentication:
+
+#### SSO-Only Mode
+
+Vaultwarden is configured to operate exclusively in SSO mode with Authentik OIDC integration:
+
+- **SSO-Only Authentication**: Users can only log in through Authentik SSO, eliminating traditional username/password authentication
+- **OIDC Integration**: Seamlessly integrated with Authentik identity provider using OpenID Connect protocol
+- **Enhanced Security**: Centralized authentication through Authentik provides:
+  - Single sign-on across all homelab services
+  - Multi-factor authentication (MFA) enforcement
+  - Centralized user management and access control
+  - Session management and security policies
+
+#### Configuration
+
+The Vaultwarden deployment includes:
+
+- **Docker Image**: `vaultwarden/server:testing-alpine` - lightweight Alpine Linux-based container
+- **OIDC Scopes**: `openid email profile offline_access` for complete user profile access
+- **Secret Management**: OIDC client secret stored as Docker secret and rotated via Terraform lifecycle management
+- **Network Integration**: Connected to the reverse proxy network for automatic TLS termination via Caddy
+- **Data Persistence**: Vault data stored in `/srv/data/vaultwarden` for backup and recovery
+
+#### Security Features
+
+- **No Password Database**: SSO-only mode means no local password database for authentication
+- **Centralized Access Control**: All access decisions managed through Authentik
+- **Encrypted Secrets**: OIDC client secrets encrypted and managed via Terraform
+- **TLS Termination**: All traffic encrypted via Caddy reverse proxy with automatic certificate renewal
+- **Domain**: Accessible at `vault.denyssizomin.com` with automatic DNS resolution
+
+This configuration provides a secure, enterprise-grade password management solution with minimal operational overhead and maximum security through centralized identity management.
+
 ## 📁 Repository Structure
 
 ```
@@ -151,14 +187,15 @@ This setup ensures:
 │   └── portainer/                 # Application deployments
 │       ├── providers.hcl          # Portainer provider configuration
 │       ├── admin/                 # Portainer admin settings
-│       ├── settings/              # Global stack settings
+│       ├── settings/              # Portainer settings
 │       ├── authentik/             # SSO & Identity Provider
 │       ├── caddy/                 # Reverse proxy & TLS termination
 │       ├── ddns/                  # Dynamic DNS updater
 │       ├── miniserve/             # Simple file server
 │       ├── opengist/              # Code snippet sharing
 │       ├── paperless/             # Document management system
-│       └── pulse/                 # System monitoring
+│       ├── pulse/                 # System monitoring
+│       └── vaultwarden/           # Password manager
 ├── modules/                       # Reusable Terraform modules
 │   ├── authentik/                 # Authentik configuration modules
 │   │   └── oidc_provider/         # OIDC provider module
@@ -180,7 +217,8 @@ This setup ensures:
 │       ├── opengist/              # Gist platform
 │       ├── paperless/             # Document management
 │       ├── pulse/                 # Monitoring
-│       └── settings/              # Stack settings
+│       ├── settings/              # Portainer settings
+│       └── vaultwarden/           # Password manager module
 ├── .sops.yaml                     # SOPS encryption configuration
 └── sops.env                       # Encrypted environment variables
 ```
@@ -293,6 +331,7 @@ Terragrunt automatically handles dependencies between modules using `dependency`
 | **AdGuard Home (Secondary)** | Redundant DNS Server | `adguard/secondary` |
 | **Authentik** | Identity Provider & SSO | `portainer/authentik` |
 | **Caddy** | Reverse Proxy & TLS | `portainer/caddy` |
+| **Vaultwarden** | Password Manager (SSO-only) | `portainer/vaultwarden` |
 | **Paperless-ngx** | Document Management | `portainer/paperless` |
 | **OpenGist** | Code Snippet Sharing | `portainer/opengist` |
 | **Miniserve** | Simple File Server | `portainer/miniserve` |

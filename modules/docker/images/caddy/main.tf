@@ -25,5 +25,11 @@ resource "docker_image" "caddy" {
     context    = path.module
     dockerfile = "Dockerfile"
   }
+
+  triggers = {
+    caddyfile_sha1 = filesha1(local_file.caddyfile.filename)
+  }
+
+  depends_on = [local_file.caddyfile]
 }
 

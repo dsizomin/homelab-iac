@@ -1,0 +1,40 @@
+include "root" {
+  path = find_in_parent_folders("root.hcl")
+}
+
+include "providers" {
+  path = find_in_parent_folders("providers.hcl")
+}
+
+dependency "oidc_config" {
+  config_path = "../../config/oidc"
+}
+
+dependency "proxy_network" {
+  config_path = "../../docker/networks/proxy"
+}
+
+dependency "dns_config" {
+  config_path = "../../config/dns"
+}
+
+generate "providers_authentik" {
+  path      = "providers_authentik.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "authentik" {
+  url   = "https://${dependency.dns_config.outputs.dns_config.services.auth}/"
+}
+EOF
+}
+
+inputs = {
+  proxy_network  = dependency.proxy_network.outputs.network_id
+  dns_config     = dependency.dns_config.outputs.dns_config
+  oidc_client_id = dependency.oidc_config.outputs.client_id.vault
+}
+
+terraform {
+  source = "../../../modules//portainer/vaultwarden"
+}
+

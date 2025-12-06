@@ -52,6 +52,10 @@ variable "services" {
       subdomain   = "home"
       description = "Dynamic DNS entry"
     }
+    vault = {
+      subdomain   = "vault"
+      description = "Vaultwarden Password Manager"
+    }
   }
 }
 

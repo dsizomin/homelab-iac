@@ -26,6 +26,7 @@ inputs = {
     proxmox_fqdn    = dependency.dns_config.outputs.dns_config.services.proxmox
     hass_fqdn       = dependency.dns_config.outputs.dns_config.services.hass
     portainer_fqdn  = dependency.dns_config.outputs.dns_config.services.portainer
+    vault_fqdn      = dependency.dns_config.outputs.dns_config.services.vault
   })
   keep_locally = true
 }

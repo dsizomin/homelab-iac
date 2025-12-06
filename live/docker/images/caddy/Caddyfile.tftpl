@@ -23,6 +23,10 @@ ${pulse_fqdn} {
   reverse_proxy tasks.pulse:7655
 }
 
+${vault_fqdn} {
+  reverse_proxy tasks.vaultwarden:80
+}
+
 ${proxmox_fqdn} {
   reverse_proxy https://192.168.1.58:8006 {
 		transport http {

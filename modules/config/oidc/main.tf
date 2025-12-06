@@ -5,7 +5,8 @@ locals {
     "paperless",
     "portainer",
     "pulse",
-    "proxmox"
+    "proxmox",
+    "vault"
   ])
 }
 

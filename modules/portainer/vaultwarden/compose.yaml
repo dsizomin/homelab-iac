@@ -1,0 +1,29 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:testing-alpine
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+      SSO_ENABLED: "true"
+      SSO_ONLY: "true"
+      SSO_SCOPE: "openid email profile offline_access"
+      SSO_CLIENT_ID: ${SSO_CLIENT_ID}
+      SSO_CLIENT_SECRET_FILE: /run/secrets/oidc_secret
+      SSO_AUTHORITY: ${SSO_AUTHORITY}
+      SSO_CLIENT_CACHE_EXPIRATION: 0
+    volumes:
+      - /srv/data/vaultwarden:/data
+    networks:
+      - proxy_network
+    secrets:
+      - oidc_secret
+
+networks:
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true
+secrets:
+  oidc_secret:
+    name: ${SSO_CLIENT_SECRET_NAME}
+    external: true
