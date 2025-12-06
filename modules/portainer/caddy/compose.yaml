@@ -1,5 +1,5 @@
 services:
-  caddy:
+  proxy:
     image: ${IMAGE}
     ports:
       - "80:80"
@@ -12,6 +12,9 @@ services:
       - proxy_network
     secrets:
       - acme_cloudflare_api_key
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
 
 networks:
   proxy_network:
@@ -23,8 +26,12 @@ secrets:
     name: ${SECRET}
     external: true
 
+configs:
+  caddyfile:
+    name: ${CADDYFILE}
+    external: true
+
 volumes:
   caddy-data:
   caddy-config:
   caddy-logs:
-

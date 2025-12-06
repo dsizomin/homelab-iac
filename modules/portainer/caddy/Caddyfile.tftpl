@@ -8,19 +8,19 @@ ${auth_fqdn} {
 }
 
 ${paperless_fqdn} {
-  reverse_proxy tasks.paperless:8000
+  reverse_proxy tasks.paperless_webserver:8000
 }
 
 ${gist_fqdn} {
-  reverse_proxy tasks.opengist:6157
+  reverse_proxy tasks.opengist_webserver:6157
 }
 
 ${cdn_fqdn} {
-  reverse_proxy tasks.miniserve:8080
+  reverse_proxy tasks.miniserve_webserver:8080
 }
 
 ${pulse_fqdn} {
-  reverse_proxy tasks.pulse:7655
+  reverse_proxy tasks.pulse_webserver:7655
 }
 
 ${vault_fqdn} {
