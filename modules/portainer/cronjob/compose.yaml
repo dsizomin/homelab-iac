@@ -1,0 +1,20 @@
+services:
+  hypervisor:
+    image: crazymax/swarm-cronjob
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      TZ: "Europe/Amsterdam"
+      LOG_LEVEL: "info"
+      LOG_JSON: "false"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - swarm_cronjob
+
+networks:
+  swarm_cronjob:
+    name: ${CRONJOB_NETWORK}
+    external: true

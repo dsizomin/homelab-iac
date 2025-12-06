@@ -1,0 +1,66 @@
+services:
+  paperless:
+    image: docker:dind
+    entrypoint: sh -c
+    command:
+      - >
+        docker exec -t
+        $$(docker container ls -q -n 1 --filter label=com.denyssizomin.apps.backup=paperless)
+        document_exporter ../export -d --no-progress-bar
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cronjob_network
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 */1 * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
+
+  upload:
+    image: cupcakearmy/autorestic
+    entrypoint: autorestic
+    command:
+      - -c
+      - /etc/autorestic/.autorestic.yaml
+      - --ci
+      - backup
+      - -a
+    configs:
+      - source: config
+        target: /etc/autorestic/.autorestic.yaml
+    secrets:
+      - source: env
+        target: /etc/autorestic/.autorestic.env
+    networks:
+      - cronjob_network
+    volumes:
+      - /srv/data/paperless/export:/srv/data/paperless:ro
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=30 */1 * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
+
+configs:
+  config:
+    external: true
+    name: "${AUTORESTIC_CONFIG_FILE}"
+
+secrets:
+  env:
+    external: true
+    name: "${AUTORESTIC_ENV_SECRET}"
+
+networks:
+  cronjob_network:
+    external: true
+    name: "${CRONJOB_NETWORK}"

@@ -1,0 +1,22 @@
+version: 2
+
+global:
+  forget:
+    keep-last: 5 # always keep at least 5 snapshots
+    keep-hourly: 3 # keep 3 last hourly snapshots
+    keep-daily: 4 # keep 4 last daily snapshots
+    keep-weekly: 1 # keep 1 last weekly snapshots
+    keep-monthly: 12 # keep 12 last monthly snapshots
+    keep-yearly: 7 # keep 7 last yearly snapshots
+    keep-within: "14d" # keep snapshots from the last 14 days
+
+locations:
+  paperless:
+    from: /srv/data/paperless
+    to: r2
+    forget: prune
+
+backends:
+  r2:
+    type: s3
+    path: https://a2de594f2c9ac168316a62056f9a7303.r2.cloudflarestorage.com/homelab-docker-apps-backup
