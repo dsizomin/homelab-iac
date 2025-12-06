@@ -17,6 +17,7 @@ dependency "dns_config" {
 locals {
   username = "denys.sizomin"
   email = "denys.sizomin@gmail.com"
+  ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/HJWec8QoIpsAIgQ7at7RrmjxxkGIPmkrwkKLb5yEx denys.sizomin@denys-sizomin-GK17KJ4VYD"
   opkssh_oidc_client_id = "mAvyAo9H61qLl74SXRSqY1rLXh3HhqkvgW3SCq6H"
   docker_cloud_config = <<EOF
 #cloud-config
@@ -62,7 +63,7 @@ inputs = {
   image_store = "local"
 
   username = local.username
-  ssh_pubkey = file("~/.ssh/homelab.pub")
+  ssh_pubkey = local.ssh_pubkey
 
   opkssh = {
     issuer    = "https://auth.denyssizomin.com/application/o/opkssh/"
