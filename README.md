@@ -159,6 +159,149 @@ The Vaultwarden deployment includes:
 
 This configuration provides a secure, enterprise-grade password management solution with minimal operational overhead and maximum security through centralized identity management.
 
+### Automated Backup System (`live/portainer/autorestic/`)
+
+The homelab includes an automated backup system using Autorestic, a wrapper around restic that provides declarative backup configuration and scheduling:
+
+#### Architecture
+
+- **Backup Tool**: [Autorestic](https://autorestic.vercel.app/) - Declarative backup configuration wrapper for restic
+- **Storage Backend**: Cloudflare R2 (S3-compatible object storage)
+- **Scheduling**: Integrated with swarm-cronjob for automated hourly backups
+- **Applications Backed Up**:
+  - **Paperless-ngx**: Document exports triggered before backup (hourly via cron)
+  - **Vaultwarden**: Vault data backups triggered before backup (hourly via cron)
+
+#### Backup Configuration
+
+**Retention Policy** (applied globally to all backups):
+- **Keep Last**: 5 snapshots (always maintain at least 5 most recent backups)
+- **Hourly**: 3 snapshots (last 3 hourly backups)
+- **Daily**: 4 snapshots (last 4 daily backups)
+- **Weekly**: 1 snapshot (last weekly backup)
+- **Monthly**: 12 snapshots (last 12 monthly backups)
+- **Yearly**: 7 snapshots (last 7 yearly backups)
+- **Keep Within**: 14 days (all snapshots from last 14 days)
+
+**Backup Locations**:
+- `/srv/data/paperless` - Paperless document exports
+- `/srv/data/vaultwarden` - Vaultwarden vault data
+
+**Backup Flow**:
+1. **Pre-backup Jobs** (every hour at minute 0):
+   - Paperless: Triggers document export via `document_exporter` command
+   - Vaultwarden: Triggers vault backup via `/vaultwarden backup` command
+2. **Upload Job** (every hour at minute 30):
+   - Autorestic reads configuration and encrypted credentials
+   - Backs up all locations to Cloudflare R2
+   - Applies retention policy and prunes old snapshots
+
+#### Security
+
+- **Encrypted Credentials**: R2 access credentials stored as Docker secrets, encrypted with SOPS
+- **Read-Only Mounts**: Backup directories mounted read-only in the upload container
+- **Network Isolation**: Backup jobs run in isolated cronjob network
+- **Immutable Storage**: R2 provides versioned, immutable object storage
+
+This automated backup system ensures critical homelab data is regularly backed up to cloud storage with a comprehensive retention policy, all managed declaratively through Terraform.
+
+### Cron Job Management (`live/portainer/cronjob/`)
+
+The homelab uses a centralized cron job management system for scheduled tasks in Docker Swarm:
+
+#### Swarm Cronjob Hypervisor
+
+- **Image**: [crazymax/swarm-cronjob](https://github.com/crazy-max/swarm-cronjob)
+- **Purpose**: Enables cron-like scheduled job execution in Docker Swarm mode
+- **Deployment**: Runs on manager node with access to Docker socket
+- **Network**: Isolated `cronjob_network` for all scheduled jobs
+
+#### How It Works
+
+The swarm-cronjob hypervisor monitors Docker services with special labels and creates one-time tasks based on cron schedules:
+
+```yaml
+deploy:
+  replicas: 0  # Service stays dormant
+  labels:
+    - "swarm.cronjob.enable=true"
+    - "swarm.cronjob.schedule=0 */1 * * *"  # Cron format
+    - "swarm.cronjob.skip-running=true"     # Skip if previous run still active
+```
+
+#### Scheduled Jobs
+
+Current cron jobs managed by the hypervisor:
+
+1. **Paperless Document Export** (hourly at minute 0)
+   - Executes document exporter inside Paperless container
+   - Prepares data for backup
+
+2. **Vaultwarden Backup** (hourly at minute 0)
+   - Triggers vault backup inside Vaultwarden container
+   - Prepares vault data for backup
+
+3. **Autorestic Upload** (hourly at minute 30)
+   - Uploads all backup data to Cloudflare R2
+   - Applies retention policies
+
+#### Benefits
+
+- **Declarative Scheduling**: Cron schedules defined as Docker labels in Compose files
+- **Swarm-Native**: Works with Docker Swarm's orchestration and placement constraints
+- **Skip Logic**: Prevents overlapping job executions with `skip-running` flag
+- **Zero Replicas**: Jobs don't consume resources until executed
+- **Centralized Management**: All scheduled tasks visible and manageable through Portainer
+
+This approach provides reliable, container-native scheduled task execution without requiring external cron daemons or additional infrastructure.
+
+### System Monitoring & Notifications (`live/portainer/pulse/`)
+
+The homelab includes Pulse for system monitoring with integrated notification capabilities via Apprise:
+
+#### Pulse Monitoring
+
+- **Image**: `rcourtman/pulse:latest` - Modern system monitoring dashboard
+- **Authentication**: Integrated with Authentik SSO via OIDC
+- **Features**:
+  - Real-time system metrics (CPU, memory, disk, network)
+  - Service health monitoring
+  - Alert configuration and management
+  - Historical data visualization
+- **Domain**: Accessible at `pulse.denyssizomin.com`
+
+#### Apprise Integration
+
+Pulse is integrated with [Apprise API](https://github.com/caronc/apprise-api) for flexible notification delivery:
+
+- **Image**: `lscr.io/linuxserver/apprise-api:latest`
+- **Purpose**: Universal notification gateway supporting 90+ services
+- **Network Architecture**:
+  - Internal network (`apprise_network`) connecting Pulse to Apprise
+  - Separate proxy network for external access if needed
+- **Supported Notification Channels**:
+  - Email (SMTP, SendGrid, Mailgun, etc.)
+  - Messaging (Slack, Discord, Telegram, Matrix, etc.)
+  - Push Notifications (Pushover, Pushbullet, Gotify, etc.)
+  - SMS (Twilio, AWS SNS, etc.)
+  - And 80+ other services
+
+#### Configuration
+
+- **Apprise Config**: Stored in persistent volume (`/config`)
+- **Plugins**: Custom notification plugins can be added via `/plugins` volume
+- **Attachments**: Support for sending file attachments via `/attachments` volume
+- **Timezone**: Europe/Amsterdam (consistent with other services)
+
+#### Use Cases
+
+- **System Alerts**: CPU/memory/disk threshold warnings
+- **Service Down Alerts**: Notification when monitored services become unavailable
+- **Backup Notifications**: Alert on backup success/failure (future integration)
+- **Security Events**: Authentication failures, suspicious activity alerts
+
+This monitoring setup provides comprehensive visibility into homelab health with flexible, multi-channel alerting capabilities, all accessible through a modern SSO-protected web interface.
+
 ## 📁 Repository Structure
 
 ```
@@ -189,12 +332,14 @@ This configuration provides a secure, enterprise-grade password management solut
 │       ├── admin/                 # Portainer admin settings
 │       ├── settings/              # Portainer settings
 │       ├── authentik/             # SSO & Identity Provider
+│       ├── autorestic/            # Automated backup system
 │       ├── caddy/                 # Reverse proxy & TLS termination
+│       ├── cronjob/               # Cron job management (swarm-cronjob)
 │       ├── ddns/                  # Dynamic DNS updater
 │       ├── miniserve/             # Simple file server
 │       ├── opengist/              # Code snippet sharing
 │       ├── paperless/             # Document management system
-│       ├── pulse/                 # System monitoring
+│       ├── pulse/                 # System monitoring with Apprise
 │       └── vaultwarden/           # Password manager
 ├── modules/                       # Reusable Terraform modules
 │   ├── authentik/                 # Authentik configuration modules
@@ -211,12 +356,14 @@ This configuration provides a secure, enterprise-grade password management solut
 │   └── portainer/                 # Application stack modules
 │       ├── admin/                 # Admin configuration
 │       ├── authentik/             # Authentik stack
+│       ├── autorestic/            # Automated backup module
 │       ├── caddy/                 # Caddy reverse proxy
+│       ├── cronjob/               # Cron job management module
 │       ├── ddns/                  # DDNS client
 │       ├── miniserve/             # File server
 │       ├── opengist/              # Gist platform
 │       ├── paperless/             # Document management
-│       ├── pulse/                 # Monitoring
+│       ├── pulse/                 # Monitoring with Apprise
 │       ├── settings/              # Portainer settings
 │       └── vaultwarden/           # Password manager module
 ├── .sops.yaml                     # SOPS encryption configuration
