@@ -49,6 +49,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "OIDC_LOGOUT_URL"
+    value = module.provider.oidc_config.logout_url
+  }
+
+  env {
     name  = "PROXY_NETWORK"
     value = var.proxy_network
   }

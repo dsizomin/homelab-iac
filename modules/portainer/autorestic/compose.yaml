@@ -63,6 +63,8 @@ services:
     volumes:
       - /srv/data/paperless/export:/srv/data/paperless:ro
       - /srv/data/vaultwarden:/srv/data/vaultwarden:ro
+      - /srv/data/opengist:/srv/data/opengist:ro
+      - /srv/data/miniserve:/srv/data/miniserve:ro
     deploy:
       mode: replicated
       replicas: 0

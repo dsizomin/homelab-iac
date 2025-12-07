@@ -3,9 +3,12 @@ services:
     image: rcourtman/pulse:latest
     environment:
       - PULSE_PUBLIC_URL=${PULSE_PUBLIC_URL}
+      - PULSE_AUDIT_LOG=true
+      - TZ=Europe/Amsterdam
       - OIDC_ENABLED=true
       - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
       - OIDC_ISSUER_URL=${OIDC_ISSUER_URL}
+      - OIDC_LOGOUT_URL=${OIDC_LOGOUT_URL}
       - OIDC_GROUPS_CLAIM=groups
     volumes:
       - /srv/data/pulse:/data

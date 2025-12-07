@@ -2,13 +2,13 @@ version: 2
 
 global:
   forget:
-    keep-last: 5 # always keep at least 5 snapshots
-    keep-hourly: 3 # keep 3 last hourly snapshots
-    keep-daily: 4 # keep 4 last daily snapshots
-    keep-weekly: 1 # keep 1 last weekly snapshots
-    keep-monthly: 12 # keep 12 last monthly snapshots
-    keep-yearly: 7 # keep 7 last yearly snapshots
-    keep-within: "14d" # keep snapshots from the last 14 days
+    keep-last: 5
+    keep-hourly: 24
+    keep-daily: 30
+    keep-weekly: 4
+    keep-monthly: 12
+    keep-yearly: 1
+    keep-within: "14d"
 
 locations:
   paperless:
@@ -18,6 +18,16 @@ locations:
 
   vaultwarden:
     from: /srv/data/vaultwarden
+    to: r2
+    forget: prune
+
+  opengist:
+    from: /srv/data/opengist
+    to: r2
+    forget: prune
+
+  miniserve:
+    from: /srv/data/miniserve
     to: r2
     forget: prune
 
