@@ -6,12 +6,14 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       SSO_ENABLED: "true"
-      SSO_ONLY: "true"
+      SSO_ONLY: "false"
       SSO_SCOPE: "openid email profile offline_access"
       SSO_CLIENT_ID: ${SSO_CLIENT_ID}
       SSO_CLIENT_SECRET_FILE: /run/secrets/oidc_secret
       SSO_AUTHORITY: ${SSO_AUTHORITY}
       SSO_CLIENT_CACHE_EXPIRATION: 0
+      SSO_SIGNUPS_MATCH_EMAIL: "true"
+      SSO_AUTH_ONLY_NOT_SESSION: "true"
     volumes:
       - /srv/data/vaultwarden:/data
     networks:

@@ -14,7 +14,7 @@ terraform {
 
 module "provider" {
   source      = "../../authentik/oidc_provider"
-  name        = "valutwarden"
+  name        = "vaultwarden"
   client_id   = var.oidc_client_id
   client_type = "confidential"
   redirect_uris = [
