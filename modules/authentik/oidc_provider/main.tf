@@ -48,6 +48,14 @@ resource "authentik_provider_oauth2" "this" {
   property_mappings  = data.authentik_property_mapping_provider_scope.oidc_scopes.ids
 
   signing_key = data.authentik_certificate_key_pair.certificate.id
+
+  lifecycle {
+    // To prevent false positives on state drift
+    ignore_changes = [
+      logout_method,
+      refresh_token_threshold
+    ]
+  }
 }
 
 resource "authentik_application" "application" {

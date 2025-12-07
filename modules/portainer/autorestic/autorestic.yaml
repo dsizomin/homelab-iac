@@ -16,6 +16,11 @@ locations:
     to: r2
     forget: prune
 
+  vaultwarden:
+    from: /srv/data/vaultwarden
+    to: r2
+    forget: prune
+
 backends:
   r2:
     type: s3

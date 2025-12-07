@@ -10,7 +10,6 @@ provider "proxmox" {
   ssh {
     username    = "root"
     agent       = true
-    private_key = file("~/.ssh/homelab")
   }
 }
 EOF

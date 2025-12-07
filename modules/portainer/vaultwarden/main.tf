@@ -36,6 +36,7 @@ resource "portainer_docker_secret" "oidc_secret_key" {
 resource "portainer_stack" "this" {
   name            = "vaultwarden"
   deployment_type = "swarm"
+  prune           = true
   endpoint_id     = 1
 
   method          = "file"

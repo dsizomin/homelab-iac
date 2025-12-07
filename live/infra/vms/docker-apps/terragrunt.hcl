@@ -21,7 +21,7 @@ terraform {
 locals {
   username = "denys.sizomin"
   email = "denys.sizomin@gmail.com"
-  ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/HJWec8QoIpsAIgQ7at7RrmjxxkGIPmkrwkKLb5yEx denys.sizomin@denys-sizomin-GK17KJ4VYD"
+  ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/HJWec8QoIpsAIgQ7at7RrmjxxkGIPmkrwkKLb5yEx denys.sizomin@denys-sizomin-GK17KJ4VYD\n"
   docker_cloud_config = <<EOF
 #cloud-config
 merge_how:

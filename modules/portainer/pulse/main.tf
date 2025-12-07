@@ -9,6 +9,10 @@ terraform {
       source  = "goauthentik/authentik"
       version = ">= 2025.10.0"
     }
+    sops = {
+      source  = "carlpett/sops"
+      version = "1.3.0"
+    }
   }
 }
 
@@ -48,5 +52,4 @@ resource "portainer_stack" "this" {
     name  = "PROXY_NETWORK"
     value = var.proxy_network
   }
-
 }

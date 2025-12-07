@@ -22,7 +22,7 @@ resource "portainer_docker_config" "config" {
   }
 }
 
-data "sops_file" "env" {
+ephemeral "sops_file" "env" {
   source_file = "${path.module}/autorestic.env"
   input_type  = "dotenv"
 }
@@ -31,7 +31,7 @@ resource "portainer_docker_secret" "env" {
   name            = "autorestic_${replace(timestamp(), ":", ".")}.env"
   endpoint_id     = 1
   data_wo_version = 1
-  data_wo         = base64encode(data.sops_file.env.raw)
+  data_wo         = base64encode(ephemeral.sops_file.env.raw)
   lifecycle {
     ignore_changes        = [name]
     create_before_destroy = true
