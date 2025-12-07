@@ -66,8 +66,6 @@ resource "docker_service" "portainer" {
       image = docker_image.portainer_ce.name
 
       args = [
-        # "--admin-password-file",
-        # local.portainer_password_file_name,
         "-H",
         "tcp://tasks.agent:9001",
         "--tlsskipverify",
@@ -78,12 +76,6 @@ resource "docker_service" "portainer" {
         source = "/srv/data/portainer"
         type   = "bind"
       }
-
-      # secrets {
-      #   secret_id   = docker_secret.portainer_password.id
-      #   secret_name = docker_secret.portainer_password.name
-      #   file_name   = local.portainer_password_file_name
-      # }
     }
 
     networks_advanced {

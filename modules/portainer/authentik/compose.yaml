@@ -1,17 +1,17 @@
 services:
-  authentik-server:
+  webserver:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.8.4}
     command: server
     environment:
-      AUTHENTIK_POSTGRESQL__HOST: tasks.authentik-db
+      AUTHENTIK_POSTGRESQL__HOST: tasks.db
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/authentik_db_password
       AUTHENTIK_POSTGRESQL__USER: authentik
-      AUTHENTIK_REDIS__HOST: tasks.authentik-redis
+      AUTHENTIK_REDIS__HOST: tasks.redis
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
     depends_on:
-      - authentik-redis
-      - authentik-db
+      - redis
+      - db
     networks:
       - authentik
       - proxy_network
@@ -22,24 +22,25 @@ services:
       - authentik_db_password
       - authentik_secret_key
 
-  authentik-worker:
+  worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.8.4}
     command: worker
     environment:
-      AUTHENTIK_POSTGRESQL__HOST: tasks.authentik-db
+      AUTHENTIK_POSTGRESQL__HOST: tasks.db
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/authentik_db_password
       AUTHENTIK_POSTGRESQL__USER: authentik
-      AUTHENTIK_REDIS__HOST: tasks.authentik-redis
+      AUTHENTIK_REDIS__HOST: tasks.redis
       AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
     depends_on:
-      - authentik-redis
-      - authentik-db
+      - redis
+      - db
     networks:
       - authentik
       - proxy_network
     user: root
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /srv/data/authentik/media:/media
       - /srv/data/authentik/templates:/templates
       - /srv/data/authentik/certs:/certs
@@ -47,23 +48,31 @@ services:
       - authentik_db_password
       - authentik_secret_key
 
-  authentik-db:
+  db:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: authentik
       POSTGRES_USER: authentik
       POSTGRES_PASSWORD_FILE: /run/secrets/authentik_db_password
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
     volumes:
-      - /srv/data/authentik/db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     networks:
       - authentik
     secrets:
       - authentik_db_password
 
-  authentik-redis:
+  redis:
     image: redis:8-alpine
     volumes:
-      - authentik-redis:/data
+      - redis:/data
     networks:
       - authentik
 
@@ -84,6 +93,5 @@ networks:
     internal: true
 
 volumes:
-  authentik-redis:
-  postgres-data:
-
+  redis:
+  db:
