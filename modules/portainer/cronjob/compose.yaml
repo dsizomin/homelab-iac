@@ -12,9 +12,34 @@ services:
         constraints:
           - node.role == manager
     networks:
-      - swarm_cronjob
+      - proxy_network
+
+  healthchecks:
+    image: healthchecks/healthchecks:latest
+    environment:
+      - DB=sqlite
+      - DB_NAME=/data/hc.sqlite
+      - DEBUG=False
+      - SECRET_KEY_FILE=/run/secrets/secret_key
+      - SITE_ROOT=https://healthchecks.denyssizomin.com
+      - ALLOWED_HOSTS=tasks.cronjob_healthchecks,healthchecks.denyssizomin.com
+      - REMOTE_USER_HEADER=HTTP_X_AUTHENTIK_EMAIL
+    volumes:
+      - healthchecks-data:/data
+    networks:
+      - proxy_network
+    secrets:
+      - secret_key
+
+secrets:
+  secret_key:
+    name: ${SECRET_KEY}
+    external: true
+
+volumes:
+  healthchecks-data:
 
 networks:
-  swarm_cronjob:
-    name: ${CRONJOB_NETWORK}
+  proxy_network:
+    name: ${PROXY_NETWORK}
     external: true

@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-resource "docker_network" "proxy_network" {
+resource "docker_network" "this" {
   name     = var.network_name
   driver   = "overlay"
   internal = false

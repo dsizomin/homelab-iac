@@ -38,6 +38,17 @@ resource "portainer_docker_secret" "env" {
   }
 }
 
+resource "portainer_docker_secret" "ping_key" {
+  name            = "healthchecks_ping_key_${replace(timestamp(), ":", ".")}"
+  endpoint_id     = 1
+  data_wo_version = 1
+  data_wo         = base64encode(var.healthchecks_ping_key)
+  lifecycle {
+    ignore_changes        = [name]
+    create_before_destroy = true
+  }
+}
+
 resource "portainer_stack" "this" {
   name            = "autorestic"
   deployment_type = "swarm"
@@ -58,7 +69,12 @@ resource "portainer_stack" "this" {
   }
 
   env {
-    name  = "CRONJOB_NETWORK"
-    value = var.cronjob_network_id
+    name  = "PROXY_NETWORK"
+    value = var.proxy_network
+  }
+
+  env {
+    name  = "PING_KEY_SECRET"
+    value = portainer_docker_secret.ping_key.name
   }
 }

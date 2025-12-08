@@ -6,12 +6,13 @@ include "providers" {
   path = find_in_parent_folders("providers.hcl")
 }
 
-dependency "cronjob" {
-  config_path = "../cronjob"
+dependency "proxy_network" {
+  config_path = "../../docker/networks/proxy"
 }
 
 inputs = {
-  cronjob_network_id = dependency.cronjob.outputs.network_id
+  proxy_network = dependency.proxy_network.outputs.network_id
+  healthchecks_ping_key = get_env("HEALTHCHECKS_PING_KEY", "")
 }
 
 terraform {

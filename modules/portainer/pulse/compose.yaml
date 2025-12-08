@@ -14,7 +14,6 @@ services:
       - /srv/data/pulse:/data
     networks:
       - proxy_network
-      - apprise_network
 
   apprise:
     image: lscr.io/linuxserver/apprise-api:latest
@@ -27,14 +26,9 @@ services:
       - plugins:/plugins
       - attachments:/attachments
     networks:
-      - apprise_network
-      - apprise_proxy
+      - proxy_network
 
 networks:
-  apprise_network:
-    name: apprise_network
-    internal: true
-  apprise_proxy:
   proxy_network:
     name: ${PROXY_NETWORK}
     external: true

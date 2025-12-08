@@ -47,3 +47,18 @@ ${portainer_fqdn} {
   }
 }
 
+healthchecks.denyssizomin.com {
+  route {
+    reverse_proxy /outpost.goauthentik.io/* tasks.authentik_webserver:9000
+
+    reverse_proxy /ping/* tasks.cronjob_healthchecks:8000
+
+    forward_auth tasks.authentik_webserver:9000 {
+      uri /outpost.goauthentik.io/auth/caddy
+      copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version
+    }
+
+    reverse_proxy tasks.cronjob_healthchecks:8000
+  }
+}
+

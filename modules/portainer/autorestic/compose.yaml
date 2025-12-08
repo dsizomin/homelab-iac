@@ -6,11 +6,15 @@ services:
       - >
         docker exec -t
         $$(docker container ls -q -n 1 --filter label=com.denyssizomin.apps.backup=paperless)
-        document_exporter ../export -d --no-progress-bar
+        document_exporter ../export -d --no-progress-bar &&
+        wget --timeout=10 --no-verbose https://healthchecks.denyssizomin.com/ping/$$(cat /run/secrets/ping_key)/autorestik_paperless
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - cronjob_network
+      - proxy_network
+    secrets:
+      - source: ping_key
+        target: /run/secrets/ping_key
     deploy:
       mode: replicated
       replicas: 0
@@ -28,11 +32,15 @@ services:
       - >
         docker exec -t
         $$(docker container ls -q -n 1 --filter label=com.denyssizomin.apps.backup=vaultwarden)
-        /vaultwarden backup
+        /vaultwarden backup &&
+        wget --timeout=10 --no-verbose https://healthchecks.denyssizomin.com/ping/$$(cat /run/secrets/ping_key)/autorestik_vaultwarden
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - cronjob_network
+      - proxy_network
+    secrets:
+      - source: ping_key
+        target: /run/secrets/ping_key
     deploy:
       mode: replicated
       replicas: 0
@@ -45,21 +53,21 @@ services:
 
   upload:
     image: cupcakearmy/autorestic
-    entrypoint: autorestic
+    entrypoint: sh -c
     command:
-      - -c
-      - /etc/autorestic/.autorestic.yaml
-      - --ci
-      - backup
-      - -a
+      - >
+        autorestic -c /etc/autorestic/.autorestic.yaml --ci backup -a &&
+        curl -fsS -m 10 --retry 5 -o /dev/null https://healthchecks.denyssizomin.com/ping/$$(cat /run/secrets/ping_key)/autorestik_upload
     configs:
       - source: config
         target: /etc/autorestic/.autorestic.yaml
     secrets:
+      - source: ping_key
+        target: /run/secrets/ping_key
       - source: env
         target: /etc/autorestic/.autorestic.env
     networks:
-      - cronjob_network
+      - proxy_network
     volumes:
       - /srv/data/paperless/export:/srv/data/paperless:ro
       - /srv/data/vaultwarden:/srv/data/vaultwarden:ro
@@ -84,8 +92,11 @@ secrets:
   env:
     external: true
     name: "${AUTORESTIC_ENV_SECRET}"
+  ping_key:
+    external: true
+    name: "${PING_KEY_SECRET}"
 
 networks:
-  cronjob_network:
+  proxy_network:
     external: true
-    name: "${CRONJOB_NETWORK}"
+    name: "${PROXY_NETWORK}"
