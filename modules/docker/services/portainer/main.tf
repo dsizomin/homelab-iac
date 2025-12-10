@@ -76,6 +76,7 @@ resource "docker_service" "portainer" {
         source = "/srv/data/portainer"
         type   = "bind"
       }
+
     }
 
     networks_advanced {
@@ -92,6 +93,27 @@ resource "docker_service" "portainer" {
       target_port    = 9443
       published_port = 9443
     }
+  }
+
+
+  labels {
+    label = "traefik.enable"
+    value = "true"
+  }
+
+  labels {
+    label = "traefik.http.routers.portainer.rule"
+    value = "Host(`${var.dns_config.services.portainer}`)"
+  }
+
+  labels {
+    label = "traefik.http.services.portainer.loadbalancer.server.port"
+    value = "9443"
+  }
+
+  labels {
+    label = "traefik.http.services.portainer.loadbalancer.server.scheme"
+    value = "https"
   }
 
   mode {

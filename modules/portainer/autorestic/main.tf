@@ -77,4 +77,9 @@ resource "portainer_stack" "this" {
     name  = "PING_KEY_SECRET"
     value = portainer_docker_secret.ping_key.name
   }
+
+  env {
+    name  = "HEALTHCHECKS_HOST"
+    value = var.dns_config.services.healthchecks
+  }
 }

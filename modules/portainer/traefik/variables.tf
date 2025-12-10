@@ -5,11 +5,6 @@ variable "acme_cloudflare_api_key" {
   description = "API key for Cloudflare to be used by Caddy for ACME DNS challenges"
 }
 
-variable "image_id" {
-  type        = string
-  description = "Docker image ID for Caddy"
-}
-
 variable "proxy_network" {
   type        = string
   description = "Docker network ID for the proxy network"

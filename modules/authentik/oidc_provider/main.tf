@@ -59,10 +59,9 @@ resource "authentik_provider_oauth2" "this" {
 }
 
 resource "authentik_application" "application" {
-  name              = var.name
+  name              = title(var.name)
   slug              = var.name
   protocol_provider = authentik_provider_oauth2.this.id
-  meta_icon         = "/media/public/application-icons/${var.name}.png"
 }
 
 resource "authentik_policy_binding" "policy_binding" {

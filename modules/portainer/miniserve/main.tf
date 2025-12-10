@@ -16,4 +16,14 @@ resource "portainer_stack" "this" {
 
   method          = "file"
   stack_file_path = "./compose.yaml"
+
+  env {
+    name  = "PROXY_NETWORK"
+    value = var.proxy_network
+  }
+
+  env {
+    name  = "MINISERVE_HOST"
+    value = var.dns_config.services.cdn
+  }
 }

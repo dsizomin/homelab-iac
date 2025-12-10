@@ -80,5 +80,10 @@ resource "portainer_stack" "this" {
     name  = "PROXY_NETWORK"
     value = var.proxy_network
   }
+
+  env {
+    name  = "OPENGIST_HOST"
+    value = var.dns_config.services.gist
+  }
 }
 

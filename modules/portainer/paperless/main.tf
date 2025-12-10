@@ -76,6 +76,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "PAPERLESS_HOST"
+    value = var.dns_config.services.paperless
+  }
+
+  env {
     name  = "DB_PASSWORD_SECRET_NAME"
     value = portainer_docker_secret.db_password.name
   }

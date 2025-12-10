@@ -1,4 +1,4 @@
-include {
+include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
@@ -11,7 +11,7 @@ dependency "reverse_proxy_host" {
 }
 
 generate "adguard_provider" {
-  path      = "providers.tf"
+  path      = "providers_adguard_secondary.tf"
   if_exists = "overwrite_terragrunt"
 
   contents = <<EOF

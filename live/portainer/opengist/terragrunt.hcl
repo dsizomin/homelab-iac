@@ -2,8 +2,12 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
-include "providers" {
-  path = find_in_parent_folders("providers.hcl")
+include "portainer" {
+  path = find_in_parent_folders("portainer.hcl")
+}
+
+include "authentik" {
+  path = find_in_parent_folders("authentik.hcl")
 }
 
 dependency "oidc_config" {
@@ -16,16 +20,6 @@ dependency "proxy_network" {
 
 dependency "dns_config" {
   config_path = "../../config/dns"
-}
-
-generate "providers_authentik" {
-  path      = "providers_authentik.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "authentik" {
-  url   = "https://${dependency.dns_config.outputs.dns_config.services.auth}/"
-}
-EOF
 }
 
 inputs = {

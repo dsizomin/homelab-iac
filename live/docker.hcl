@@ -1,9 +1,9 @@
 dependency "docker_host" {
-  config_path = "${path_relative_from_include()}/../infra/vms/docker-apps"
+  config_path = "${path_relative_from_include()}/infra/vms/docker-apps"
 }
 
 generate "docker_provider" {
-  path      = "providers.tf"
+  path      = "providers_docker.tf"
   if_exists = "overwrite_terragrunt"
 
   contents = <<EOF

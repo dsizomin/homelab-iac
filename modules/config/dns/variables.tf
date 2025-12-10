@@ -56,6 +56,14 @@ variable "services" {
       subdomain   = "vault"
       description = "Vaultwarden Password Manager"
     }
+    traefik = {
+      subdomain   = "traefik"
+      description = "Traefik Reverse Proxy"
+    }
+    healthchecks = {
+      subdomain   = "healthchecks"
+      description = "Healthchecks.io Monitoring"
+    }
   }
 }
 

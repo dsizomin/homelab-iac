@@ -1,9 +1,9 @@
 dependency "dns_config" {
-  config_path = "../../config/dns"
+  config_path = "${path_relative_from_include()}/config/dns"
 }
 
-generate "providers" {
-  path      = "providers.tf"
+generate "authentik_provider" {
+  path      = "providers_authentik.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "authentik" {

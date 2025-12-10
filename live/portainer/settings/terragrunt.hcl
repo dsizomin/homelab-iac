@@ -3,30 +3,20 @@ include "root" {
 }
 
 include "providers" {
-  path = find_in_parent_folders("providers.hcl")
+  path = find_in_parent_folders("portainer.hcl")
+}
+
+include "authentik" {
+  path = find_in_parent_folders("authentik.hcl")
 }
 
 dependency "oidc_config" {
   config_path = "../../config/oidc"
 }
 
-dependency "dns_config" {
-  config_path = "../../config/dns"
-}
-
-inputs = {
+inputs = {  
   oidc_client_id     = dependency.oidc_config.outputs.client_id.portainer
-  portainer_hostname = "portainer.denyssizomin.com"
-}
-
-generate "providers_authentik" {
-  path      = "providers_authentik.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "authentik" {
-  url   = "https://${dependency.dns_config.outputs.dns_config.services.auth}/"
-}
-EOF
+  portainer_hostname = dependency.dns_config.outputs.dns_config.services.portainer
 }
 
 terraform {

@@ -1,0 +1,77 @@
+services:
+  proxy:
+    image: traefik:v3.6.4
+    command:
+      # HTTPS EntryPoint
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      # Providers
+      - "--providers.swarm.endpoint=unix:///var/run/docker.sock"
+      - "--providers.swarm.watch=true"
+      - "--providers.swarm.network=proxy_network"
+      - "--providers.swarm.exposedbydefault=false"
+      # API & Dashboard
+      - "--api.dashboard=true" # Enable the dashboard
+      - "--api.insecure=true" # Explicitly disable insecure API mod
+      # Observability
+      - "--log.level=INFO" # Set the Log Level e.g INFO, DEBUG
+      - "--accesslog=true" # Enable Access Logs
+      # ACME DNS with Cloudflare
+      - "--certificatesResolvers.cloudflare.acme.email=${ACME_EMAIL}"
+      - "--certificatesResolvers.cloudflare.acme.storage=/acme/acme.json"
+      - "--certificatesResolvers.cloudflare.acme.dnsChallenge.provider=cloudflare"
+      - "--certificatesResolvers.cloudflare.acme.dnsChallenge.delayBeforeCheck=0"
+      - "--entrypoints.websecure.http.tls.certresolver=cloudflare"
+      - "--serverstransport.insecureskipverify=true"
+
+    environment:
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/acme
+    networks:
+      - proxy_network
+    secrets:
+      - cf_dns_api_token
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.middlewares.traefik.forwardauth.address=http://tasks.authentik_webserver:9000/outpost.goauthentik.io/auth/traefik"
+        - "traefik.http.middlewares.traefik.forwardauth.trustForwardHeader=true"
+        - "traefik.http.middlewares.traefik.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version"
+        - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_HOST}`)"
+        - "traefik.http.routers.dashboard.middlewares=traefik"
+        - "traefik.http.routers.dashboard.service=api@internal"
+
+        - "traefik.http.routers.traefik-auth.rule=Host(`${TRAEFIK_HOST}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+        - "traefik.http.routers.traefik-auth.service=authentik"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+        - "traefik.http.routers.proxmox.rule=Host(`${PROXMOX_HOST}`)"
+        - "traefik.http.routers.proxmox.service=proxmox"
+        - "traefik.http.services.proxmox.loadbalancer.server.url=https://192.168.1.58:8006/"
+
+        - "traefik.http.routers.homeassistant.rule=Host(`${HASS_HOST}`)"
+        - "traefik.http.routers.homeassistant.service=homeassistant"
+        - "traefik.http.services.homeassistant.loadbalancer.server.url=http://192.168.1.44:8123/"
+
+networks:
+  proxy_network:
+    name: "${PROXY_NETWORK_NAME}"
+    external: true
+
+secrets:
+  cf_dns_api_token:
+    name: "${CF_DNS_API_TOKEN_SECRET}"
+    external: true
+
+volumes:
+  acme:

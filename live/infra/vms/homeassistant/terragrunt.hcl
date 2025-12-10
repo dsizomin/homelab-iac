@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "proxmox" {
-  path = find_in_parent_folders("providers.hcl")
+  path = find_in_parent_folders("proxmox.hcl")
 }
 
 terraform {

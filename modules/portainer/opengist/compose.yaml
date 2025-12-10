@@ -13,7 +13,11 @@ services:
       - OG_OIDC_ADMIN_GROUP=${OG_OIDC_ADMIN_GROUP}
     secrets:
       - opengist_secrets
-
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.opengist.rule=Host(`${OPENGIST_HOST}`)"
+        - "traefik.http.services.opengist.loadbalancer.server.port=6157"
 networks:
   proxy_network:
     name: ${PROXY_NETWORK}

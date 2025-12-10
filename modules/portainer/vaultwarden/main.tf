@@ -67,4 +67,9 @@ resource "portainer_stack" "this" {
     value = module.provider.oidc_config.issuer_url
   }
 
+  env {
+    name  = "VAULTWARDEN_HOST"
+    value = var.dns_config.services.vault
+  }
+
 }

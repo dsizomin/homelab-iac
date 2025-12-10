@@ -7,7 +7,11 @@ services:
       /data --mkdir --rm-files --upload-files --interfaces 0.0.0.0 --port 8080
     networks:
       - proxy_network
-
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.miniserve.rule=Host(`${MINISERVE_HOST}`)"
+        - "traefik.http.services.miniserve.loadbalancer.server.port=8080"
 networks:
   proxy_network:
     name: ${PROXY_NETWORK}

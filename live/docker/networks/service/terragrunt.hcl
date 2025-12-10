@@ -7,7 +7,7 @@ include "docker" {
 }
 
 inputs = {
-  network_name = "proxy_network"
+  network_name = "service_network"
 }
 
 terraform {

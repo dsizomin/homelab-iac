@@ -63,4 +63,9 @@ resource "portainer_stack" "this" {
     name  = "PROXY_NETWORK"
     value = var.proxy_network
   }
+
+  env {
+    name  = "AUTHENTIK_HOST"
+    value = var.dns_config.services.auth
+  }
 }

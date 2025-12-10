@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "providers" {
-  path = find_in_parent_folders("providers.hcl")
+  path = find_in_parent_folders("portainer.hcl")
 }
 
 dependency "dns_config" {

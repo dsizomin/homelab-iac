@@ -21,6 +21,11 @@ services:
     secrets:
       - authentik_db_password
       - authentik_secret_key
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.authentik.rule=Host(`${AUTHENTIK_HOST}`)"
+        - "traefik.http.services.authentik.loadbalancer.server.port=9000"
 
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.8.4}
@@ -40,7 +45,7 @@ services:
       - proxy_network
     user: root
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /srv/data/authentik/media:/media
       - /srv/data/authentik/templates:/templates
       - /srv/data/authentik/certs:/certs

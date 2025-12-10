@@ -11,7 +11,7 @@ dependency "reverse_proxy_host" {
 }
 
 generate "adguard_provider" {
-  path      = "providers.tf"
+  path      = "providers_adguard_primary.tf"
   if_exists = "overwrite_terragrunt"
 
   contents = <<EOF

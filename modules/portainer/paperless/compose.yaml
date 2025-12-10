@@ -51,7 +51,11 @@ services:
       PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
       PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
       PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
-
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_HOST}`)"
+        - "traefik.http.services.paperless.loadbalancer.server.port=8000"
     secrets:
       - paperless_db_password
       - paperless_secret_key
