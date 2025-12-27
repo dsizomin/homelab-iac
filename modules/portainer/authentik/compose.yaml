@@ -15,6 +15,7 @@ services:
     networks:
       - authentik
       - proxy_network
+      - service_network
     volumes:
       - /srv/data/authentik/media:/media
       - /srv/data/authentik/templates:/templates
@@ -43,6 +44,7 @@ services:
     networks:
       - authentik
       - proxy_network
+      - service_network
     user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -92,6 +94,9 @@ secrets:
 networks:
   proxy_network:
     name: ${PROXY_NETWORK}
+    external: true
+  service_network:
+    name: ${SERVICE_NETWORK}
     external: true
   authentik:
     name: authentik

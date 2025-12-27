@@ -3,6 +3,11 @@ variable "proxy_network" {
   description = "Docker network ID for the proxy network"
 }
 
+variable "service_network" {
+  type        = string
+  description = "Docker network ID for the service network"
+}
+
 variable "oidc_client_id" {
   type        = string
   description = "The client ID for the Pulse OIDC provider."

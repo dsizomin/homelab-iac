@@ -51,6 +51,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "SERVICE_NETWORK"
+    value = var.service_network
+  }
+
+  env {
     name  = "SECRET_KEY"
     value = portainer_docker_secret.secret_key.name
   }

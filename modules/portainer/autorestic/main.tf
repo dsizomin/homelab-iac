@@ -69,8 +69,8 @@ resource "portainer_stack" "this" {
   }
 
   env {
-    name  = "PROXY_NETWORK"
-    value = var.proxy_network
+    name  = "SERVICE_NETWORK"
+    value = var.service_network
   }
 
   env {

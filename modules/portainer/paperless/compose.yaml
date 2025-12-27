@@ -29,6 +29,7 @@ services:
     networks:
       - proxy_network
       - paperless_network
+      - service_network
     volumes:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
@@ -72,6 +73,9 @@ networks:
     internal: true
   proxy_network:
     name: ${PROXY_NETWORK}
+    external: true
+  service_network:
+    name: ${SERVICE_NETWORK}
     external: true
 
 secrets:

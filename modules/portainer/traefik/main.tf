@@ -49,6 +49,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "SERVICE_NETWORK_NAME"
+    value = var.service_network
+  }
+
+  env {
     name  = "CF_DNS_API_TOKEN_SECRET"
     value = portainer_docker_secret.acme_cloudflare_api_key.name
   }

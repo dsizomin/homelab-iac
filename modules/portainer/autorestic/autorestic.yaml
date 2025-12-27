@@ -10,26 +10,24 @@ global:
     keep-yearly: 1
     keep-within: "14d"
 
+extras:
+  common: &common
+    to: r2
+    forget: prune
+
 locations:
   paperless:
     from: /srv/data/paperless
-    to: r2
-    forget: prune
-
+    <<: *common
   vaultwarden:
     from: /srv/data/vaultwarden
-    to: r2
-    forget: prune
-
+    <<: *common
   opengist:
     from: /srv/data/opengist
-    to: r2
-    forget: prune
-
+    <<: *common
   miniserve:
     from: /srv/data/miniserve
-    to: r2
-    forget: prune
+    <<: *common
 
 backends:
   r2:

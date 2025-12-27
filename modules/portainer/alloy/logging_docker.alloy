@@ -1,0 +1,50 @@
+discovery.docker "swarm" {
+	host                = "unix:///var/run/docker.sock"
+	refresh_interval    = "5s"
+	match_first_network = true
+}
+
+discovery.relabel "swarm" {
+	targets = discovery.docker.swarm.targets
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+		target_label  = "service_name"
+	}
+
+	rule {
+		action        = "drop"
+		source_labels = ["service_name"]
+		regex         = "alloy_collector"
+	}
+}
+
+loki.source.docker "swarm" {
+	host             = "unix:///var/run/docker.sock"
+	targets          = discovery.relabel.swarm.output
+	forward_to       = [loki.process.swarm.receiver]
+	refresh_interval = "5s"
+
+	labels = {
+		"instance" = constants.hostname,
+	}
+}
+
+loki.process "swarm" {
+	forward_to = [loki.write.swarm.receiver]
+
+	stage.drop {
+		older_than = "1m"
+	}
+}
+
+loki.write "swarm" {
+	endpoint {
+		url = "https://logs-prod-012.grafana.net/loki/api/v1/push"
+
+		basic_auth {
+			username      = "1423849"
+			password_file = "/run/secrets/grafana_api_key"
+		}
+	}
+}

@@ -53,6 +53,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "SERVICE_NETWORK"
+    value = var.service_network
+  }
+
+  env {
     name  = "SSO_CLIENT_ID"
     value = var.oidc_client_id
   }

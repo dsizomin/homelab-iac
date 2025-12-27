@@ -1,6 +1,6 @@
-variable "proxy_network" {
+variable "service_network" {
   type        = string
-  description = "Docker network ID for the proxy network"
+  description = "Docker network ID for the service network"
 }
 
 variable "healthchecks_ping_key" {

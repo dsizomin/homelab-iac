@@ -18,6 +18,7 @@ services:
       - /srv/data/vaultwarden:/data
     networks:
       - proxy_network
+      - service_network
     secrets:
       - oidc_secret
     labels:
@@ -30,6 +31,9 @@ services:
 networks:
   proxy_network:
     name: ${PROXY_NETWORK}
+    external: true
+  service_network:
+    name: ${SERVICE_NETWORK}
     external: true
 secrets:
   oidc_secret:

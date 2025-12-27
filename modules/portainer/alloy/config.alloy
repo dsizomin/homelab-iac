@@ -1,0 +1,15 @@
+livedebugging {
+  enabled = true
+}
+
+remotecfg {
+  id = constants.hostname
+  url = "https://fleet-management-prod-011.grafana.net"
+  attributes = {
+    platform = "docker.swarm",
+  }
+  basic_auth {
+    username      = "1466056"
+    password_file = "/run/secrets/grafana_api_key"
+  }
+}

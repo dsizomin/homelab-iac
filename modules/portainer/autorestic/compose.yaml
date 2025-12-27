@@ -4,14 +4,16 @@ services:
     entrypoint: sh -c
     command:
       - >
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_paperless/start;
         docker exec -t
         $$(docker container ls -q -n 1 --filter label=com.denyssizomin.apps.backup=paperless)
         document_exporter ../export -d --no-progress-bar &&
-        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_paperless
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_paperless ||
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_paperless/fail
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - proxy_network
+      - service_network
     secrets:
       - source: ping_key
         target: /run/secrets/ping_key
@@ -30,14 +32,16 @@ services:
     entrypoint: sh -c
     command:
       - >
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_vaultwarden/start;
         docker exec -t
         $$(docker container ls -q -n 1 --filter label=com.denyssizomin.apps.backup=vaultwarden)
         /vaultwarden backup &&
-        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_vaultwarden
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_vaultwarden ||
+        wget --timeout=10 --no-verbose https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_vaultwarden/fail
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - proxy_network
+      - service_network
     secrets:
       - source: ping_key
         target: /run/secrets/ping_key
@@ -56,8 +60,10 @@ services:
     entrypoint: sh -c
     command:
       - >
-        autorestic -c /etc/autorestic/.autorestic.yaml --ci backup -a &&
-        curl -fsS -m 10 --retry 5 -o /dev/null https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_upload
+        curl -fsS -m 10 --retry 5 -o /dev/null https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_upload/start; 
+        autorestic -c /etc/autorestic/.autorestic.yaml backup -a &&
+        curl -fsS -m 10 --retry 5 -o /dev/null https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_upload ||
+        curl -fsS -m 10 --retry 5 -o /dev/null https://${HEALTHCHECKS_HOST}/ping/$$(cat /run/secrets/ping_key)/autorestik_upload/fail
     configs:
       - source: config
         target: /etc/autorestic/.autorestic.yaml
@@ -67,7 +73,7 @@ services:
       - source: env
         target: /etc/autorestic/.autorestic.env
     networks:
-      - proxy_network
+      - service_network
     volumes:
       - /srv/data/paperless/export:/srv/data/paperless:ro
       - /srv/data/vaultwarden:/srv/data/vaultwarden:ro
@@ -97,6 +103,6 @@ secrets:
     name: "${PING_KEY_SECRET}"
 
 networks:
-  proxy_network:
+  service_network:
     external: true
-    name: "${PROXY_NETWORK}"
+    name: "${SERVICE_NETWORK}"

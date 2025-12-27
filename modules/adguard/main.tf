@@ -48,3 +48,9 @@ resource "adguard_rewrite" "rewrite" {
   domain = "*.${var.dns_config.zone}"
   answer = var.reverse_proxy_ip
 }
+
+resource "adguard_user_rules" "rules" {
+  rules = [
+    "@@||stats.grafana.org^$important"
+  ]
+}

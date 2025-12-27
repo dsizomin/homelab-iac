@@ -1,0 +1,37 @@
+services:
+  collector:
+    image: grafana/alloy:latest
+    command: run --server.http.listen-addr 0.0.0.0:12345 --stability.level=experimental /etc/alloy/config.alloy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: alloy
+        target: /etc/alloy/config.alloy
+    secrets:
+      - source: grafana_api_key
+        target: /run/secrets/grafana_api_key
+    networks:
+      - service_network
+      - proxy_network
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.alloy.rule=Host(`alloy.denyssizomin.com`)"
+        - "traefik.http.services.alloy.loadbalancer.server.port=12345"
+
+configs:
+  alloy:
+    name: ${ALLOY_CONFIG_NAME}
+    external: true
+secrets:
+  grafana_api_key:
+    name: ${GRAFANA_API_KEY_NAME}
+    external: true
+
+networks:
+  service_network:
+    name: ${SERVICE_NETWORK_NAME}
+    external: true
+  proxy_network:
+    name: ${PROXY_NETWORK_NAME}
+    external: true

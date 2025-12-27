@@ -302,6 +302,74 @@ Pulse is integrated with [Apprise API](https://github.com/caronc/apprise-api) fo
 
 This monitoring setup provides comprehensive visibility into homelab health with flexible, multi-channel alerting capabilities, all accessible through a modern SSO-protected web interface.
 
+### Grafana Alloy Observability (`live/portainer/alloy/`)
+
+The homelab uses Grafana Alloy as the unified observability collector, providing comprehensive metrics and log collection with Grafana Cloud integration:
+
+#### Architecture
+
+- **Collector**: [Grafana Alloy](https://grafana.com/docs/alloy/) - OpenTelemetry-compatible observability collector
+- **Configuration Management**: Grafana Fleet Management for remote pipeline configuration
+- **Metrics Backend**: Grafana Cloud Prometheus
+- **Logs Backend**: Grafana Cloud Loki
+- **Deployment**: Docker Swarm service with Docker socket access for container discovery
+
+#### Fleet Management Pipelines
+
+Alloy uses Grafana Fleet Management for centralized, remote configuration of collection pipelines:
+
+1. **Self Monitoring** (`self.alloy`)
+   - Exports Alloy's own health metrics (CPU, memory, component status)
+   - Collects Alloy container logs
+   - Job label: `integrations/alloy` (compatible with Grafana Cloud Alloy Health dashboard)
+
+2. **Docker Swarm Logging** (`logging_docker.alloy`)
+   - Discovers all Docker Swarm services automatically
+   - Collects container logs from all services (except Alloy itself to avoid duplication)
+   - Drops logs older than 1 minute to prevent backlog issues
+   - Labels logs with service name and hostname
+
+3. **Traefik Metrics** (`traefik_prom.alloy`)
+   - Discovers Traefik reverse proxy service
+   - Scrapes Prometheus metrics from Traefik's metrics endpoint
+   - Relabels HTTP status codes for grouping (e.g., `200` → `2**`)
+   - Provides request/response metrics, latency, and error rates
+
+#### Configuration
+
+- **Base Config** (`config.alloy`):
+  - Live debugging enabled for real-time troubleshooting
+  - Remote configuration from Grafana Fleet Management
+  - Platform attribute: `docker.swarm` for pipeline matching
+
+- **Pipeline Matchers**:
+  - `self.alloy`: Matches all collectors (`collector.os=~".*"`)
+  - `logging_docker.alloy`: Matches Docker platforms (`platform=~"^docker.*"`)
+  - `traefik_prom.alloy`: Matches Docker platforms (`platform=~"^docker.*"`)
+
+#### Network Integration
+
+- **Service Network**: Access to internal services for metrics scraping
+- **Proxy Network**: Traefik integration for web UI access at `alloy.denyssizomin.com`
+- **Docker Socket**: Read-only access for container discovery
+
+#### Security
+
+- **Grafana API Key**: Stored as Docker secret, encrypted with SOPS
+- **Read-Only Docker Socket**: Container discovery without modification permissions
+- **Terraform Lifecycle Management**: Secrets rotated on configuration changes
+
+#### Collected Data
+
+| Type | Source | Destination |
+|------|--------|-------------|
+| Metrics | Alloy health | Grafana Cloud Prometheus |
+| Metrics | Traefik proxy | Grafana Cloud Prometheus |
+| Logs | All Docker Swarm services | Grafana Cloud Loki |
+| Logs | Alloy container | Grafana Cloud Loki |
+
+This observability stack provides centralized monitoring and logging for the entire homelab infrastructure, with Grafana Cloud handling storage, visualization, and alerting.
+
 ## 📁 Repository Structure
 
 ```
@@ -483,6 +551,7 @@ Terragrunt automatically handles dependencies between modules using `dependency`
 | **OpenGist** | Code Snippet Sharing | `portainer/opengist` |
 | **Miniserve** | Simple File Server | `portainer/miniserve` |
 | **Pulse** | System Monitoring | `portainer/pulse` |
+| **Grafana Alloy** | Observability Collector | `portainer/alloy` |
 | **DDNS** | Dynamic DNS Client | `portainer/ddns` |
 | **Home Assistant** | Home Automation | `infra/vms/homeassistant` |
 

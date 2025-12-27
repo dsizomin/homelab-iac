@@ -71,6 +71,11 @@ resource "portainer_stack" "this" {
   }
 
   env {
+    name  = "SERVICE_NETWORK"
+    value = var.service_network
+  }
+
+  env {
     name  = "PAPERLESS_URL"
     value = "https://${var.dns_config.services.paperless}"
   }

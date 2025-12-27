@@ -1,0 +1,59 @@
+discovery.docker "integrations_traefik" {
+	host                = "unix:///var/run/docker.sock"
+	refresh_interval    = "5s"
+	match_first_network = false
+
+	filter {
+		name   = "label"
+		values = ["com.docker.swarm.service.name=traefik_proxy"]
+	}
+}
+
+discovery.relabel "metrics_integrations_traefik" {
+	targets = discovery.docker.integrations_traefik.targets
+
+	rule {
+		action        = "keep"
+		source_labels = ["__meta_docker_network_name"]
+		regex         = "service_network"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_network_ip"]
+		target_label  = "__address__"
+		replacement   = "$1:9090"
+	}
+
+	rule {
+		action = "labelkeep"
+		regex  = "__address__"
+	}
+}
+
+prometheus.scrape "metrics_integrations_traefik" {
+	targets    = discovery.relabel.metrics_integrations_traefik.output
+	forward_to = [prometheus.relabel.metrics_integrations_traefik.receiver]
+	job_name   = "integrations/traefik"
+}
+
+prometheus.relabel "metrics_integrations_traefik" {
+	forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+	rule {
+		source_labels = ["code"]
+		regex         = "^(\\d).."
+		replacement   = "$1**"
+		target_label  = "code"
+	}
+}
+
+prometheus.remote_write "metrics_service" {
+	endpoint {
+		url = "https://prometheus-prod-65-prod-eu-west-2.grafana.net/api/prom/push"
+
+		basic_auth {
+			username      = "2856345"
+			password_file = "/run/secrets/grafana_api_key"
+		}
+	}
+}
